@@ -1,4 +1,3 @@
-#
 #IMPORTATIONS
 import pygame, os, numpy as np,time, random
 from pygame.locals import*
