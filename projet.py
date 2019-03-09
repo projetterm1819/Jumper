@@ -3,12 +3,12 @@ import pygame, os, numpy as np,time, random
 from pygame.locals import*
 
 #INITIALISATIONS DE LA FENETRE ET PYGAME
-os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (0,30)
 pygame.init()
 py_info=pygame.display.Info() #1366/768 dimensions écran etienne
-width_screen,height_screen=py_info.current_w,py_info.current_h
+width_screen,height_screen=(py_info.current_w),(py_info.current_h)
 pygame.display.set_caption("Jumper")
-screen=pygame.display.set_mode((width_screen,height_screen-30))
+os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (0,int(3.5/100*height_screen))#placage de la fenetre par rapport au top left
+screen=pygame.display.set_mode((int(width_screen),int(height_screen-3.5/100*height_screen)))
 
 pygame.key.set_repeat(70,5) #(delay,interval)
 pygame.display.update()
@@ -226,11 +226,11 @@ class PLATFORM():
 
 class CLOUD():
 	def __init__(self,x,y,speed):
-		self.speed = speed/40
+		self.speed = speed/random.uniform(35,45)
 		self.posX = x
 		self.dir = 1
 		self.posY = y
-		self.img = pygame.image.load("IMAGES/cloud1.png").convert_alpha()
+		self.img = pygame.image.load("IMAGES/cloud"+str(random.randint(1,8))+".png").convert_alpha()
 
 	def update(self):
 		self.posX += self.dir*self.speed
@@ -278,7 +278,7 @@ def ScreenDisplay(): #on update l'ecran
     pygame.display.update()
 
 for i in range(10):
-	cloud = CLOUD(random.randint(-500,0),random.randint(0,height_screen),random.randint(1,10)) #(x,y,speed)
+	cloud = CLOUD(random.randint(-500,0),random.randint(0,height_screen*2/3),random.randint(1,10)) #(x,y,speed)
 	clouds.append(cloud)
 
 #BOUCLE PRINCIPALE
