@@ -17,6 +17,14 @@ pygame.display.update()
 Game = True
 inGame = True
 inMenu = False
+colors = ["Blue","Green","Grey","Red"]
+sprite_number = ["1","2","3","4","Dead","DeadFall"]
+sprite_type = ["walk","walk","walk","walk","",""]
+sens = random.randint(0,1)
+discs = []
+clouds = []
+platforms = []
+
 
 #DECLARATION DES CLASSES
 class PLAYER():
@@ -27,34 +35,11 @@ class PLAYER():
 		self.lives = 3 #Nombre de vies
 		self.isdead = False #Qualité de la vie
 		self.coins = 0 #Money Money Money (ABBA)
-		self.player = "player_blue"
-		self.img1Blue = pygame.image.load("IMAGES/player_blue/player_walk1.png").convert_alpha()
-		self.img2Blue = pygame.image.load("IMAGES/player_blue/player_walk2.png").convert_alpha()
-		self.img3Blue = pygame.image.load("IMAGES/player_blue/player_walk3.png").convert_alpha()
-		self.img4Blue = pygame.image.load("IMAGES/player_blue/player_walk4.png").convert_alpha()
-		self.imgDeadBlue = pygame.image.load("IMAGES/player_blue/player_dead.png").convert_alpha() #Mort
-		self.imgDeadFallBlue = pygame.image.load("IMAGES/player_blue/player_fall.png").convert_alpha() #Quand il tombe, raide, Mort
+		self.player = "player_Blue"
+		for color in colors:
+			for number in sprite_number:
+				self."img"+number+color=pygame.image.load("IMAGES/player_"+str(color).lower()+"/player_"+str(sprite_type[sprite_number.index(number)]).lower()+str(number).lower()+".png").convert_alpha()
 
-		self.img1Green = pygame.image.load("IMAGES/player_green/player_walk1.png").convert_alpha()
-		self.img2Green = pygame.image.load("IMAGES/player_green/player_walk2.png").convert_alpha()
-		self.img3Green = pygame.image.load("IMAGES/player_green/player_walk3.png").convert_alpha()
-		self.img4Green = pygame.image.load("IMAGES/player_green/player_walk4.png").convert_alpha()
-		self.imgDeadGreen = pygame.image.load("IMAGES/player_green/player_dead.png").convert_alpha()
-		self.imgDeadFallGreen = pygame.image.load("IMAGES/player_green/player_fall.png").convert_alpha()
-
-		self.img1Grey = pygame.image.load("IMAGES/player_grey/player_walk1.png").convert_alpha()
-		self.img2Grey = pygame.image.load("IMAGES/player_grey/player_walk2.png").convert_alpha()
-		self.img3Grey = pygame.image.load("IMAGES/player_grey/player_walk3.png").convert_alpha()
-		self.img4Grey = pygame.image.load("IMAGES/player_grey/player_walk4.png").convert_alpha()
-		self.imgDeadGrey = pygame.image.load("IMAGES/player_grey/player_dead.png").convert_alpha()
-		self.imgDeadFallGrey = pygame.image.load("IMAGES/player_grey/player_fall.png").convert_alpha()
-
-		self.img1Red = pygame.image.load("IMAGES/player_red/player_walk1.png").convert_alpha()
-		self.img2Red = pygame.image.load("IMAGES/player_red/player_walk2.png").convert_alpha()
-		self.img3Red = pygame.image.load("IMAGES/player_red/player_walk3.png").convert_alpha()
-		self.img4Red = pygame.image.load("IMAGES/player_red/player_walk4.png").convert_alpha()
-		self.imgDeadRed = pygame.image.load("IMAGES/player_red/player_dead.png").convert_alpha()
-		self.imgDeadFallRed = pygame.image.load("IMAGES/player_red/player_fall.png").convert_alpha()
 
 		self.imgsBlue = [self.img1Blue,self.img2Blue,self.img3Blue,self.img4Blue,self.img3Blue,self.img2Blue] #Ordre d'apparition des Sprites
 		self.imgsGreen = [self.img1Green,self.img2Green,self.img3Green,self.img4Green,self.img3Green,self.img2Green]
@@ -78,13 +63,13 @@ class PLAYER():
 		if self.imgNumber > 5:
 			self.imgNumber = 0
 
-		if self.player == "player_blue":
+		if self.player == "player_Blue":
 			self.img = self.imgsBlue[self.imgNumber]
-		elif self.player == "player_green":
+		elif self.player == "player_Green":
 			self.img = self.imgsGreen[self.imgNumber]
-		elif self.player == "player_grey":
+		elif self.player == "player_Grey":
 			self.img = self.imgsGrey[self.imgNumber]
-		elif self.player == "player_red":
+		elif self.player == "player_Red":
 			self.img = self.imgsRed[self.imgNumber]
 
 		screen.blit(self.img,(self.posX,self.posY))
@@ -103,7 +88,7 @@ class PLAYER():
 		if self.posY>=1/4*height_screen and self.posX<=height_screen*3/4: #ATTERISSAGE
 			self.hasLanded = True
 			self.isJumping = False
-			if player.player=="player_green":
+			if player.player=="player_Green":
 				self.impulsion = 5
 				self.g = 0.04*(height_screen/768)
 			else:
@@ -165,11 +150,11 @@ class GAME():
 
 		screen.blit(self.coin,(width_screen*15/16,height_screen*1/15))
 		screen.blit(self.numbers[int(player.coins)],(width_screen*29/32,height_screen*1/15))
-		if player.player=="player_green":
+		if player.player=="player_Green":
 			screen.blit(self.jumpSymbol,(10,height_screen*15/16))
-		elif player.player=="player_grey":
+		elif player.player=="player_Grey":
 			screen.blit(self.discSymbol,(10,height_screen*15/16))
-		elif player.player=="player_red":
+		elif player.player=="player_Red":
 			pass
 
 	def update(self):	#fonctionne pas???
@@ -266,10 +251,6 @@ def ScreenDisplay(): #on update l'ecran
 		disc.update()
 	pygame.display.update()
 
-sens = random.randint(0,1)
-discs = []
-clouds = []
-platforms = []
 player = PLAYER()
 game = GAME()
 # game.ReadMap()
@@ -298,18 +279,18 @@ while Game:
 					player.isJumping = True
 				if event.key == K_DOWN and player.impulsion>0:
 					player.impulsion = -1 #impulsion<0 donc phase de chute, on donne -1 pour qu'il ait déja une vitesse de chute
-				if event.key == K_SPACE and player.player=="player_grey" and len(discs)<1: #une attaque de grey à la fois
+				if event.key == K_SPACE and player.player=="player_Grey" and len(discs)<1: #une attaque de grey à la fois
 					disc = DISC()
 					discs.append(disc)
 				if event.key == K_TAB: #changer de joueur
-					if player.player=="player_blue":
-						player.player="player_green"
-					elif player.player=="player_green":
-						player.player="player_grey"
-					elif player.player=="player_grey":
-						player.player="player_red"
-					elif player.player=="player_red":
-						player.player="player_blue"
+					if player.player=="player_Blue":
+						player.player="player_Green"
+					elif player.player=="player_Green":
+						player.player="player_Grey"
+					elif player.player=="player_Grey":
+						player.player="player_Red"
+					elif player.player=="player_Red":
+						player.player="player_Blue"
 		ScreenDisplay()
 
 pygame.quit()
