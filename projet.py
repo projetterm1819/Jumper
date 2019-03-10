@@ -21,19 +21,19 @@ inMenu = False
 #DECLARATION DES CLASSES
 class PLAYER():
 	def __init__(self):
-		self.posX = width_screen*1/4
-		self.posY = 400
-		self.speed = 5
-		self.lives = 3
-		self.isdead = False
-		self.coins = 0
+		self.posX = int(width_screen*1/4) #Position en X (Par rapport au Left)
+		self.posY = int(height_screen/2) #Position en Y (par rapport au Top)
+		self.speed = 5 #Vitesse du joueur
+		self.lives = 3 #Nombre de vies
+		self.isdead = False #Qualité de la vie
+		self.coins = 0 #Money Money Money (ABBA)
 		self.player = "player_blue"
 		self.img1Blue = pygame.image.load("IMAGES/player_blue/player_walk1.png").convert_alpha()
 		self.img2Blue = pygame.image.load("IMAGES/player_blue/player_walk2.png").convert_alpha()
 		self.img3Blue = pygame.image.load("IMAGES/player_blue/player_walk3.png").convert_alpha()
 		self.img4Blue = pygame.image.load("IMAGES/player_blue/player_walk4.png").convert_alpha()
-		self.imgDeadBlue = pygame.image.load("IMAGES/player_blue/player_dead.png").convert_alpha()
-		self.imgDeadFallBlue = pygame.image.load("IMAGES/player_blue/player_fall.png").convert_alpha()
+		self.imgDeadBlue = pygame.image.load("IMAGES/player_blue/player_dead.png").convert_alpha() #Mort
+		self.imgDeadFallBlue = pygame.image.load("IMAGES/player_blue/player_fall.png").convert_alpha() #Quand il tombe, raide, Mort
 
 		self.img1Green = pygame.image.load("IMAGES/player_green/player_walk1.png").convert_alpha()
 		self.img2Green = pygame.image.load("IMAGES/player_green/player_walk2.png").convert_alpha()
@@ -56,7 +56,7 @@ class PLAYER():
 		self.imgDeadRed = pygame.image.load("IMAGES/player_red/player_dead.png").convert_alpha()
 		self.imgDeadFallRed = pygame.image.load("IMAGES/player_red/player_fall.png").convert_alpha()
 
-		self.imgsBlue = [self.img1Blue,self.img2Blue,self.img3Blue,self.img4Blue,self.img3Blue,self.img2Blue]
+		self.imgsBlue = [self.img1Blue,self.img2Blue,self.img3Blue,self.img4Blue,self.img3Blue,self.img2Blue] #Ordre d'apparition des Sprites
 		self.imgsGreen = [self.img1Green,self.img2Green,self.img3Green,self.img4Green,self.img3Green,self.img2Green]
 		self.imgsGrey = [self.img1Grey,self.img2Grey,self.img3Grey,self.img4Grey,self.img3Grey,self.img2Grey]
 		self.imgsRed = [self.img1Red,self.img2Red,self.img3Red,self.img4Red,self.img3Red,self.img2Red]
@@ -69,7 +69,7 @@ class PLAYER():
 		self.isJumping = False
 		self.hasLanded = False
 		self.impulsion = 3
-		self.g = 0.02
+		self.g = 0.02*(height_screen/768) #Paramétré proportionnellement a l'ordi d'Etienne
 
 	def update(self):
 		if self.updateImg > 5:
@@ -100,22 +100,22 @@ class PLAYER():
 			self.impulsion = 0
 			self.Jump_Fall()
 
-		if self.posY>=400 and self.posX<1000: #ATTERISSAGE
+		if self.posY>=1/4*height_screen and self.posX<=height_screen*3/4: #ATTERISSAGE
 			self.hasLanded = True
 			self.isJumping = False
 			if player.player=="player_green":
 				self.impulsion = 5
-				self.g = 0.04
+				self.g = 0.04*(height_screen/768)
 			else:
 				self.impulsion = 3
-				self.g = 0.02
+				self.g = 0.02*(height_screen/768)
 			self.imgNumber = 0
 
 	def move(self,dir):
 		self.updateImg += 1
 		self.posX += self.speed*((dir=="right")-(dir=="left"))	#deplacement latéral
 
-	def Jump_Fall(self): 
+	def Jump_Fall(self):
 		self.posY-=self.impulsion
 		self.impulsion -= self.g #impulsion est positive puis négative (impulsion [3 --> -3])
 
@@ -157,24 +157,20 @@ class GAME():
 		self.jumpSymbol = pygame.image.load("IMAGES/JumpSymbol.png").convert_alpha()
 
 	def UI(self):
-		x = 10
-		live = 0
-		for live in range(int(player.lives)):
-			screen.blit(self.heartFull,(x,10))
-			x+=60
-		x = 130
+		x = 60
+		for live in range(player.lives):
+			screen.blit(self.heartFull,(width_screen*2/32+(live-1)*x,height_screen*1/15))
 		for live_empty in range(2-live):
-			screen.blit(self.heartEmpty	,(x,10))
-			x-=60
+			screen.blit(self.heartEmpty	,(width_screen*2/32+(live-1)*x,height_screen*1/15))
 
-		screen.blit(self.coin,(width_screen*.95,10))
-		screen.blit(self.numbers[int(player.coins)],(width_screen*.92,15))
+		screen.blit(self.coin,(width_screen*15/16,height_screen*1/15))
+		screen.blit(self.numbers[int(player.coins)],(width_screen*29/32,height_screen*1/15))
 		if player.player=="player_green":
-			screen.blit(self.jumpSymbol,(10,height_screen-60))
+			screen.blit(self.jumpSymbol,(10,height_screen*15/16))
 		elif player.player=="player_grey":
-			screen.blit(self.discSymbol,(10,height_screen-70))
+			screen.blit(self.discSymbol,(10,height_screen*15/16))
 		elif player.player=="player_red":
-			pass			
+			pass
 
 	def update(self):	#fonctionne pas???
 		print("si si je fonctionne") #ah bah nan ca marche pas..
@@ -199,19 +195,19 @@ class GAME():
 		pass
 
 	def ReadMap(self):
-	    map = np.loadtxt("map.txt",delimiter=None,dtype=str)
-	    for y in range(0,15):
-        		block = map[y]
-        		time, size = block.split(".")
-        		platform = PLATFORM(int(time),int(size),y)
-        		platforms.append(platform)
+		map = np.loadtxt("map.txt",delimiter=None,dtype=str)
+		for y in range(0,15):
+				block = map[y]
+				time, size = block.split(".")
+				platform = PLATFORM(int(time),int(size),y)
+				platforms.append(platform)
 
 class PLATFORM():
 	def __init__(self,time,size,y):
 		self.time = time
 		self.size = size
 		self.img = pygame.image.load("IMAGES/tileGreen_27.png").convert_alpha()
-		self.posX = 1366
+		self.posX = width_screen
 		self.posY = y
 		self.t = 0
 
@@ -219,30 +215,30 @@ class PLATFORM():
 		self.t+=0.01
 		if self.t>self.time:
 			self.posX -= speed
-			x = 0
+			x = width_screen
 			for i in range(self.size):
-				screen.blit(self.img,(self.posX+x,self.posY*50))
+				screen.blit(self.img,(self.posX+x,self.posY*int(height_screen/15)))
 				x += 64
 
 class CLOUD():
 	def __init__(self,x,y,speed):
-		self.speed = speed/random.uniform(35,45)
+		self.speed = (speed-2*sens*speed)/random.randint(30,50)
 		self.posX = x
-		self.dir = 1
 		self.posY = y
 		self.img = pygame.image.load("IMAGES/cloud"+str(random.randint(1,8))+".png").convert_alpha()
 
 	def update(self):
-		self.posX += self.dir*self.speed
+		self.posX += self.speed
+		if self.posX>width_screen or self.posX<-98:
+			self.posX=-98+sens*(width_screen+98)
+			self.posY = random.randint(0,height_screen*2/3)
+			self.speed = (random.randint(8,15)-2*sens*random.randint(8,15))/random.randint(30,50)
+			self.img = pygame.image.load("IMAGES/cloud"+str(random.randint(1,8))+".png").convert_alpha()
 		screen.blit(self.img,(self.posX,self.posY))
-		if self.posX>width_screen+1000:
-			self.posX=-random.randint(-500,0)
-			self.posY = random.randint(0,height_screen)
-			self.speed = random.randint(1,10)/40
 
 class DISC(): #disque d'attaque de grey
 	def __init__(self):
-		self.speed = 5
+		self.speed = 5*(width_screen/768)
 		self.posX = player.posX + 10
 		self.posY = player.posY + 10
 		self.img = pygame.image.load("IMAGES/disc.png").convert_alpha()
@@ -257,6 +253,20 @@ class DISC(): #disque d'attaque de grey
 	def __del__(self):
 		pass
 
+def ScreenDisplay(): #on update l'ecran
+	screen.fill((196,233,242))
+	# for platform in platforms:
+		# platform.update()
+	for cloud in clouds:
+		cloud.update()
+	game.update()
+	game.UI()
+	player.update()
+	for disc in discs:
+		disc.update()
+	pygame.display.update()
+
+sens = random.randint(0,1)
 discs = []
 clouds = []
 platforms = []
@@ -264,21 +274,9 @@ player = PLAYER()
 game = GAME()
 # game.ReadMap()
 
-def ScreenDisplay(): #on update l'ecran
-    screen.fill((196,233,242))
-    # for platform in platforms:
-    	# platform.update()
-    for cloud in clouds:
-    	cloud.update()
-    game.update()
-    game.UI()
-    player.update()
-    for disc in discs:
-    	disc.update()
-    pygame.display.update()
 
-for i in range(10):
-	cloud = CLOUD(random.randint(-500,0),random.randint(0,height_screen*2/3),random.randint(1,10)) #(x,y,speed)
+for i in range(random.randint(10,20)):
+	cloud = CLOUD(random.randint(0,width_screen),random.randint(0,height_screen*2/3),random.randint(8,15)) #(x,y,speed)
 	clouds.append(cloud)
 
 #BOUCLE PRINCIPALE
@@ -286,32 +284,32 @@ while Game:
 	while inMenu:
 		print("menu")
 	while inGame:
-	    for event in pygame.event.get(): #pile des évènements
-	        if event.type == QUIT or event.type==KEYDOWN and event.key == K_ESCAPE: #on quitte le jeu
-	            inGame = False
-	            inMenu = False
-	            Game = False
-	        if event.type == KEYDOWN:
-	        	if event.key == K_LEFT:
-	        		player.move("left")
-	        	if event.key == K_RIGHT:
-	        		player.move("right")
-	        	if event.key == K_UP and player.hasLanded: #on saute si on est déja à terre
-	        		player.isJumping = True
-	        	if event.key == K_DOWN and player.impulsion>0:
-	        		player.impulsion = -1 #impulsion<0 donc phase de chute, on donne -1 pour qu'il ait déja une vitesse de chute
-	        	if event.key == K_SPACE and player.player=="player_grey" and len(discs)<1: #une attaque de grey à la fois
-	        		disc = DISC()
-	        		discs.append(disc)
-	        	if event.key == K_TAB: #changer de joueur
-	        		if player.player=="player_blue":
-	        			player.player="player_green"
-	        		elif player.player=="player_green":
-	        			player.player="player_grey"
-	        		elif player.player=="player_grey":
-	        			player.player="player_red"
-	        		elif player.player=="player_red":
-	        			player.player="player_blue"
-	    ScreenDisplay()
+		for event in pygame.event.get(): #pile des évènements
+			if event.type == QUIT or event.type==KEYDOWN and event.key == K_ESCAPE: #on quitte le jeu
+				inGame = False
+				inMenu = False
+				Game = False
+			if event.type == KEYDOWN:
+				if event.key == K_LEFT:
+					player.move("left")
+				if event.key == K_RIGHT:
+					player.move("right")
+				if event.key == K_UP and player.hasLanded: #on saute si on est déja à terre
+					player.isJumping = True
+				if event.key == K_DOWN and player.impulsion>0:
+					player.impulsion = -1 #impulsion<0 donc phase de chute, on donne -1 pour qu'il ait déja une vitesse de chute
+				if event.key == K_SPACE and player.player=="player_grey" and len(discs)<1: #une attaque de grey à la fois
+					disc = DISC()
+					discs.append(disc)
+				if event.key == K_TAB: #changer de joueur
+					if player.player=="player_blue":
+						player.player="player_green"
+					elif player.player=="player_green":
+						player.player="player_grey"
+					elif player.player=="player_grey":
+						player.player="player_red"
+					elif player.player=="player_red":
+						player.player="player_blue"
+		ScreenDisplay()
 
 pygame.quit()
