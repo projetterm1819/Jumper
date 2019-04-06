@@ -1,15 +1,15 @@
 # -*-coding:utf-8 -*-
 """
-#####Dernières modifs : 6 avril a 17h46
+#####Dernières modifs : 6 avril a 18h05
 
 """ 
 """
 #####TASKLIST :
 -LOIS:
 -scoring, menu tkinter, aléatoire organisé
-
+-plaque de début, qui fait que le joueur ne tombe pas direct
 ETIENNE:
--physique de jeu (chute)(+Lois aussi....)
+
 A RÉPARTIR :
 
 """
@@ -289,7 +289,7 @@ class PLATFORM(pygame.sprite.Sprite):
 
 
     def update(self):
-        if self.posX < -64*self.size: #!!!juste pour le debug et le fun xD
+        if self.posX < -64*self.size:
             self.posX = width_screen
             self.posY = random.randint(5,10)
             self.size = random.randint(2,5)
@@ -301,7 +301,7 @@ class PLATFORM(pygame.sprite.Sprite):
             self.enemy = None
             del self.coin
             self.coin = None
-            if random.randint(0,proba_enemy) and len(enemies)<=5: #nouvel ennemi si y'en a pas déja un sur la plateforme et si y'en a au max 5 sur l'écran
+            if random.randint(0,proba_enemy) and len(enemies)<=2: #nouvel ennemi si y'en a pas déja un sur la plateforme et si y'en a au max 3 sur l'écran
                 enemy = ENEMY(["Flying","Walking","Floating"][random.randint(0,2)],random.randint(0,(self.size-1)*64),42,self)
                 enemies.add(enemy)
                 self.enemy = enemy
@@ -616,7 +616,7 @@ for i in range(random.randint(10,20)): #instanciation des nuages pour le fond
 #toutes les instanciations ci-dessous sont pour les tests et le debug
 for i in range(5):
     size = random.randint(2,5)
-    platform = PLATFORM(i*2,size,random.randint(5,10))
+    platform = PLATFORM(i*3,size,random.randint(5,10))
     platforms.add(platform)
     if random.randint(0,proba_enemy)==1:
         enemy = ENEMY(["Flying","Walking","Floating"][random.randint(0,2)],random.randint(0,(size-1)*64),42,platform)
