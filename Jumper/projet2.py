@@ -1,15 +1,53 @@
 # -*-coding:utf-8 -*-
 """
-#####Dernières modifs : 6 avril a 17h46
+#####Dernières modifs : 6 avril a 18h05
 
 """ 
 """
 #####TASKLIST :
 -LOIS:
--scoring, menu tkinter, aléatoire organisé
+-scoring, menu tkinter, lier le menu dans la boucle principale
+-plaque de début, qui fait que le joueur ne tombe pas direct
+-aléatoire organisé : 
+    régles :-pas 2 plateformes qui se superposent
+            -pas 2 plateformes l'une juste au dessus de l'autre
+            -pas plus de 4 ou 3 hauteurs de différence de hauteur entre 2 plateformes
+
+Le prof voulait des trucs intelligents? ca me semble bien ca :
+les plaques, des arbres, fleurs ou herbes qui changent suivant la saison du jeu
+-créer une class environnement
+    -permet de gérer des arbres, fleurs et plantes
+    -s'inspirer des classes enemy ou coin
+    -chaque instance de cette classe appartiendra à une plateforme
+    -passer à la classe les arguments model(le nom de l'image),x,y,platform(a qui elle "appartient")
+    -dans init redeclarer les variables + image+rect
+    -dans update() : juste bouger la plateforme en x et en y avec le rect en prenant la pos de la plateforme+la pos de l'env 
+    -fontion delete() où on dégage de la liste env_objects et où on del self
+    -fonction __del__() avec juste pass dedans
+
+
+-4 types d'environnement (juste de la déco, pas d'effets spéciaux) :
+    -blue   : tree_winter 1+2
+    -brown  : tree_automn 1+2
+    -green  : tree 1+2 ; grass 1+2+3
+    -yellow : flowers purple+blue grass 1+2+3
+    --> ca veut dire créer dans GAME() une var sur le type d'environnement (pourquoi pas les 4 saisons)
+    --> var qui change tous les x cycles, x aléatoire en a et b (à définir)
+    --> dans class platform
+        - créer var self.environnement, que l'on efface quand la plaque disparait cf fonction update(), avec les coins, enemy et powerup (c'est le meme systeme)
+        - modifier le systeme aléatoire qui génère des environnements pour qu'il s'adapte à la saison
+    --> créer des listes pour chaque saison, créer une liste contenant les 4 noms de saison
+        Dans Game init
+        self.seasons = {"winter":self.winterList;"summer":self.summerList...}
+        self.winterList = [""] #noms des images possibles de winter
+    --> pour générer un environnement : season=seasons[game.season]
+                                        environnement = season[random.randint(0,len(season))]
+                                        instancier la classe ENVIRONNMENT avec le type défini juste au dessus, et les autres paramètres, cf fonction update(), 1ere condition dans platform
+
+
 
 ETIENNE:
--physique de jeu (chute)(+Lois aussi....)
+
 A RÉPARTIR :
 
 """
@@ -18,6 +56,7 @@ A RÉPARTIR :
 #####Problèmes rencontrés dans le jeu, a débuguer par quelqu'un :
 -on voit pu trop les symboles des joueurs
 -1 symbole sans transparence et mal dimensionné
+-mort du joueur
 """
 
 ########################################################################################################################
@@ -48,7 +87,7 @@ proba_coin = 10
 proba_enemy = 10
 
 sprite_numbers = ["1","2","3","4","Dead","DeadFall"] #1,2,3 et 4 sont des sprites quand le player marche
-sprite_type = ["walk","walk","walk","walk","",""]# D'où... Ceci
+sprite_type = ["walk","walk","walk","walk","",""]
 
 FPS = 300
 sens = random.randint(0,1) #Pour sens=0, les nuages vont a droite,sinon, a gauche
@@ -59,11 +98,18 @@ globalSpeed = 2 #vitesse globale du jeu
 discs = pygame.sprite.RenderUpdates()
 clouds = pygame.sprite.RenderUpdates()
 platforms = pygame.sprite.RenderUpdates()
-enemies = pygame.sprite.RenderPlain()
-coins = pygame.sprite.RenderPlain()
+enemies = pygame.sprite.RenderUpdates()
+coins = pygame.sprite.RenderUpdates()
 powerups = pygame.sprite.RenderUpdates()
+env_objects = pygame.sprite.RenderUpdates() #environnement
 
 playerGroup = pygame.sprite.RenderUpdates() #juste le joueur
+
+#images repositories
+UI="IMAGES/UI/"
+NUMBERS="IMAGES/UI/NUMBERS/"
+OBJECTS="IMAGES/OBJECTS/"
+ENV = "IMAGES/ENVIRONNEMENT/"
 
 
 ########################################################################################################################
@@ -217,18 +263,18 @@ class PLAYER(pygame.sprite.Sprite): #Tout ce qui concerne le joueur
 class GAME():
     def __init__(self):
         #IMAGES
-        self.heartFull = pygame.image.load("IMAGES/heartFull.png").convert_alpha() #chargement des images pour l'UI
-        self.heartEmpty = pygame.image.load("IMAGES/heartEmpty.png").convert_alpha()
+        self.heartFull = pygame.image.load(UI+"heartFull.png").convert_alpha() #chargement des images pour l'UI
+        self.heartEmpty = pygame.image.load(UI+"heartEmpty.png").convert_alpha()
         self.numbers = []
         for i in range(10):
-            self.numbers.append(pygame.image.load("IMAGES/"+str(i)+".png").convert_alpha()) #on charge les images des nombres
-        self.discSymbol = pygame.image.load("IMAGES/DiscSymbol.png").convert_alpha()
-        self.jumpSymbol = pygame.image.load("IMAGES/JumpSymbol.png").convert_alpha()
-        self.shieldSymbol = pygame.image.load("IMAGES/ShieldSymbol.png").convert_alpha()
+            self.numbers.append(pygame.image.load(NUMBERS+str(i)+".png").convert_alpha()) #on charge les images des nombres
+        self.discSymbol = pygame.image.load(UI+"DiscSymbol.png").convert_alpha()
+        self.jumpSymbol = pygame.image.load(UI+"JumpSymbol.png").convert_alpha()
+        self.shieldSymbol = pygame.image.load(UI+"ShieldSymbol.png").convert_alpha()
 
         self.spritesCoin = ["coin1","coin2","coin3","coin4","coin5","coin6"]
         for sprite in self.spritesCoin:
-            setattr(self,sprite,pygame.image.load("IMAGES/"+sprite+".png").convert_alpha())
+            setattr(self,sprite,pygame.image.load(OBJECTS+sprite+".png").convert_alpha())
 
         #COIN ANIMATION
         self.animationCoin = [self.coin1,self.coin2,self.coin3,self.coin4,self.coin5,self.coin6]
@@ -240,6 +286,7 @@ class GAME():
 
     def UI(self):
         pygame.draw.rect(screen,(196,233,242),(1166,0,1366,60))
+        pygame.draw.rect(screen,(196,233,242),(0,0,1366,60))
         x = 60
         live = 0
 
@@ -289,30 +336,36 @@ class PLATFORM(pygame.sprite.Sprite):
 
 
     def update(self):
-        if self.posX < -64*self.size: #!!!juste pour le debug et le fun xD
+        if self.posX < -64*self.size:
             self.posX = width_screen
             self.posY = random.randint(5,10)
             self.size = random.randint(2,5)
             self.image = pygame.image.load("IMAGES/tiles/green/"+str(self.size)+".png").convert_alpha()
             self.rect = self.image.get_rect().inflate(10,0)
-            del self.powerup
-            self.powerup = None
-            del self.enemy
-            self.enemy = None
-            del self.coin
-            self.coin = None
-            if random.randint(0,proba_enemy) and len(enemies)<=5: #nouvel ennemi si y'en a pas déja un sur la plateforme et si y'en a au max 5 sur l'écran
+            if self.powerup:
+                    self.powerup.delete()
+                    self.powerup = None
+            if self.enemy:
+                    self.enemy.die()
+                    self.enemy = None
+            if self.coin:
+                    self.coin.delete()
+                    self.coin = None
+
+
+            if random.randint(0,proba_enemy)==1 and len(enemies)<=2: #nouvel ennemi si y'en a au max 3 sur l'écran
                 enemy = ENEMY(["Flying","Walking","Floating"][random.randint(0,2)],random.randint(0,(self.size-1)*64),42,self)
                 enemies.add(enemy)
                 self.enemy = enemy
-            elif random.randint(0,proba_coin) and len(coins)<=3:
+            elif random.randint(0,proba_coin)==1 and len(coins)<=2:
                 coin = COIN(50,50,self)
                 coins.add(coin)
                 self.coin = coin
             elif random.randint(0,proba_powerup)==1 and len(powerups)==0:
                 powerup = POWERUP(50,50,self)
                 powerups.add(powerup)
-                platform.powerup = powerup
+                self.powerup = powerup
+
 
         self.t+=0.01
         if self.t>self.time: #si le temps est écoulé, on arrive à l'écran
@@ -322,7 +375,7 @@ class PLATFORM(pygame.sprite.Sprite):
 
 
 ########################################################################################################################
-#Nuages de Background###################################################################################################
+#Nuages en fond ########################################################################################################
 ########################################################################################################################
 class CLOUD(pygame.sprite.Sprite):
     def __init__(self,x,y,speed):
@@ -333,7 +386,7 @@ class CLOUD(pygame.sprite.Sprite):
         self.posY = y
 
         #IMAGES AND COLLISIONS
-        self.image = pygame.image.load("IMAGES/cloud"+str(random.randint(1,8))+".png").convert_alpha()
+        self.image = pygame.image.load("IMAGES/CLOUDS/cloud"+str(random.randint(1,8))+".png").convert_alpha()
         self.rect = self.image.get_rect()
         self.rect.x = self.posX
         self.rect.y = self.posY
@@ -344,7 +397,7 @@ class CLOUD(pygame.sprite.Sprite):
             self.posX=-98+sens*(width_screen+98)
             self.posY = random.randint(0,height_screen*2/3)
             self.speed = (random.randint(8,15)-2*sens*random.randint(8,15))/random.randint(30,50)
-            self.image = pygame.image.load("IMAGES/cloud"+str(random.randint(1,8))+".png").convert_alpha()
+            self.image = pygame.image.load("IMAGES/CLOUDS/cloud"+str(random.randint(1,8))+".png").convert_alpha()
             self.rect = self.image.get_rect()
         self.rect.x = self.posX
         self.rect.y = self.posY
@@ -361,7 +414,7 @@ class DISC(pygame.sprite.Sprite):
         self.posY = player.posY + 10
 
         #IMAGE AND COLLISIONS
-        self.image = pygame.image.load("IMAGES/disc.png").convert_alpha()
+        self.image = pygame.image.load("IMAGES/player_grey/disc.png").convert_alpha()
         self.rect = self.image.get_rect()
 
     def update(self):
@@ -502,7 +555,7 @@ class ENEMY(pygame.sprite.Sprite): #INFOS : (pour walking : y>=42)
             self.direction = -1
 
 ########################################################################################################################
-#Objets : Bonus#######################################################################################################
+#Objets : Bonus#########################################################################################################
 ########################################################################################################################
 class POWERUP(pygame.sprite.Sprite):
     def __init__(self,x,y,platform):
@@ -513,7 +566,7 @@ class POWERUP(pygame.sprite.Sprite):
         self.y = y
 
         #IMAGES and RECT
-        self.image = pygame.image.load("IMAGES/powerup_empty.png").convert_alpha()
+        self.image = pygame.image.load(OBJECTS+"powerup_empty.png").convert_alpha()
         self.rect = self.image.get_rect()
 
     def update(self):
@@ -528,11 +581,15 @@ class POWERUP(pygame.sprite.Sprite):
             self.platform.powerup = None
             del self
 
+    def delete(self):
+        powerups.remove(self)
+        del self
+
     def __del__(self):
         pass
 
 ########################################################################################################################
-#Objets : Pièces#######################################################################################################
+#Objets : Pièces########################################################################################################
 ########################################################################################################################
 class COIN(pygame.sprite.Sprite): #INFOS : (pour coins : y>=50)
     def __init__(self,x,y,platform):
@@ -545,7 +602,7 @@ class COIN(pygame.sprite.Sprite): #INFOS : (pour coins : y>=50)
         #IMAGES AND ANIMATIONS
         self.sprites = ["coin1","coin2","coin3","coin4","coin5","coin6"]
         for sprite in self.sprites:
-            setattr(self,sprite,pygame.image.load("IMAGES/"+sprite+".png").convert_alpha())
+            setattr(self,sprite,pygame.image.load(OBJECTS+sprite+".png").convert_alpha())
         self.animation = [self.coin1,self.coin2,self.coin3,self.coin4,self.coin5,self.coin6]
         self.animNumber = 0
         self.image = self.animation[self.animNumber]
@@ -566,12 +623,17 @@ class COIN(pygame.sprite.Sprite): #INFOS : (pour coins : y>=50)
 
         if self.rect.colliderect(player.rect): #si le joueur prend la pièce
             player.coins += 1
-            coins.remove(self)
             self.platform.coin = None
-            del self
+            self.delete()
+
+    def delete(self):
+        coins.remove(self)
+        del self
 
     def __del__(self):
         pass
+
+
 
 
 ########################################################################################################################
@@ -581,12 +643,12 @@ def ScreenDisplay(): #on update l'ecran
     #Group.clear(screen, background) efface la zone du sprite en remplacant avec background, sur le screen
     #Group.update() appelle la fonction update de tous les membres du groupe
     #Group.draw(screen) dessine chaque sprite à l'écran avec son rect et son image sur le screen
-    ALLTYPES = {platforms,enemies,coins,discs,playerGroup,powerups}
-    pygame.draw.rect(screen,(196,233,242),player.bubbleRect) #effacer la bulle
-    clouds.clear(screen,background)
-    for Type in ALLTYPES:
-        Type.clear(screen,background)
-
+    ALLTYPES = {platforms,enemies,coins,discs,playerGroup,powerups,env_objects}
+    # pygame.draw.rect(screen,(196,233,242),player.bubbleRect) #effacer la bulle
+    # clouds.clear(screen,background)
+    # for Type in ALLTYPES:
+    #     Type.clear(screen,background)
+    screen.blit(background,(0,0))
     game.UI() #on update l'UI
 
     clouds.update()
@@ -594,14 +656,22 @@ def ScreenDisplay(): #on update l'ecran
     for Type in ALLTYPES:
         Type.update()
         Type.draw(screen)
-        
+
+    for x in range(22):
+        screen.blit(water,(x*64,704))
+    for x in range(22):
+        screen.blit(water,(x*64,640))
+    for x in range(22):
+        screen.blit(water_top,(x*64,576))
     pygame.display.update() #maj de l'écran
+
+
 
 ########################################################################################################################
 #Instanciation des objets###############################################################################################
 ########################################################################################################################
-
-
+water = pygame.image.load("IMAGES/fluidBlue.png").convert_alpha()
+water_top = pygame.image.load("IMAGES/fluidBlue_top.png").convert_alpha()
 
 player = PLAYER()
 game = GAME()
@@ -613,24 +683,10 @@ for i in range(random.randint(10,20)): #instanciation des nuages pour le fond
     clouds.add(cloud)
 
 
-#toutes les instanciations ci-dessous sont pour les tests et le debug
 for i in range(5):
-    size = random.randint(2,5)
-    platform = PLATFORM(i*2,size,random.randint(5,10))
+    size = random.randint(4,5)
+    platform = PLATFORM(i*3,size,random.randint(5,10))
     platforms.add(platform)
-    if random.randint(0,proba_enemy)==1:
-        enemy = ENEMY(["Flying","Walking","Floating"][random.randint(0,2)],random.randint(0,(size-1)*64),42,platform)
-        enemies.add(enemy)
-        platform.enemy = enemy
-    elif random.randint(0,proba_coin)==1:
-        coin = COIN(50,50,platform)
-        coins.add(coin)
-        platform.coin = coin
-    elif random.randint(0,proba_powerup)==1:
-        powerup = POWERUP(50,50,platform)
-        powerups.add(powerup)
-        platform.powerup = powerup
-
 
 
 ########################################################################################################################
@@ -645,7 +701,7 @@ while Game:
         fpsClock.tick(FPS)
 
         player.move()
-        player.XForce += (player.XForce<0)*player.speed*1/4 - (player.XForce>0)*player.speed*1/4
+        player.XForce += (player.XForce<0)*player.speed*1/3 - (player.XForce>0)*player.speed*1/3
 
         for event in pygame.event.get(): #pile des évènements
             if event.type == QUIT or event.type==KEYDOWN and event.key == K_ESCAPE: #on quitte le jeu

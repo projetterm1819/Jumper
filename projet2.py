@@ -1,6 +1,6 @@
 # -*-coding:utf-8 -*-
 """
-#####Dernières modifs : 6 avril a 18h04
+#####Dernières modifs : 6 avril a 18h05
 
 """ 
 """
@@ -9,7 +9,7 @@
 -scoring, menu tkinter, aléatoire organisé
 
 ETIENNE:
--physique de jeu (chute)(+Lois aussi....)
+
 A RÉPARTIR :
 
 """
