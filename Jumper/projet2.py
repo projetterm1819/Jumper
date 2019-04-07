@@ -669,14 +669,17 @@ def ScreenDisplay(): #on update l'ecran
 ########################################################################################################################
 #Instanciation des objets###############################################################################################
 ########################################################################################################################
-water = pygame.image.load("IMAGES/fluidBlue.png").convert_alpha()
-water_top = pygame.image.load("IMAGES/fluidBlue_top.png").convert_alpha()
 
 player = PLAYER()
 game = GAME()
 fpsClock = pygame.time.Clock()
+
 background = pygame.image.load("IMAGES/background.png").convert_alpha()
+water = pygame.image.load("IMAGES/fluidBlue.png").convert_alpha()
+water_top = pygame.image.load("IMAGES/fluidBlue_top.png").convert_alpha()
+
 screen.blit(background,(0,0))
+
 for i in range(random.randint(10,20)): #instanciation des nuages pour le fond
     cloud = CLOUD(random.randint(0,width_screen),random.randint(0,height_screen*2/3),random.randint(8,15)) #(x,y,speed)
     clouds.add(cloud)
@@ -694,6 +697,7 @@ for i in range(5):
 while Game:
     while inMenu:
         print("menu")
+        #a toi d'ajouter ton menu ici, ou un lien vers le programme menu
 
     while inGame:
 
