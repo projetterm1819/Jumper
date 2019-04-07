@@ -3,6 +3,7 @@
 #####Dernières modifs : 7 avril a 14h53, Loïs
 """ 
 """
+
 #######################################################################################################################
 #####TASKLIST :########################################################################################################
 #######################################################################################################################
@@ -45,6 +46,8 @@ les plaques, des arbres, fleurs ou herbes qui changent suivant la saison du jeu
 	--> pour generer un environnement : season=seasons[game.season]
 										environnement = season[random.randint(0,len(season))]
 										instancier la classe ENVIRONNMENT avec le type defini juste au dessus, et les autres paramètres, cf fonction update(), 1ere condition dans platform
+#####Problèmes rencontres dans le jeu, a debuguer par quelqu'un :
+=======
 ETIENNE:###############################################################################################################
 #######################################################################################################################
 
@@ -777,8 +780,6 @@ while Game:
 				player.lives += 1
 				Game = False
 
-
 	ScreenDisplay()
 	pygame.time.wait(1)
-
 pygame.quit()
