@@ -1,6 +1,11 @@
 # -*-coding:utf-8 -*-
 """
-#####Dernières modifs : 7 avril a 14h27, ETIENNE
+#####Dernières modifs : 7 avril a 14h38, ETIENNE
+###Quoi de neuf?
+-de l'eau
+-un code + propre
+-un futur environnement? quelques variables déja prêtes
+
 """ 
 """
 #####TASKLIST :
