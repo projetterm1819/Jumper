@@ -1,7 +1,6 @@
 # -*-coding:utf-8 -*-
 """
 #####Dernières modifs : 7 avril a 14h15
-
 """ 
 """
 #####TASKLIST :
