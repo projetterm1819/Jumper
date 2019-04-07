@@ -12,7 +12,6 @@
 	régles :-pas 2 plateformes qui se superposent
 			-pas 2 plateformes l'une juste au dessus de l'autre
 			-pas plus de 4 ou 3 hauteurs de différence de hauteur entre 2 plateformes
-
 Le prof voulait des trucs intelligents? ca me semble bien ca :
 les plaques, des arbres, fleurs ou herbes qui changent suivant la saison du jeu
 -créer une class environnement
@@ -24,8 +23,6 @@ les plaques, des arbres, fleurs ou herbes qui changent suivant la saison du jeu
 	-dans update() : juste bouger la plateforme en x et en y avec le rect en prenant la pos de la plateforme+la pos de l'env 
 	-fontion delete() où on dégage de la liste env_objects et où on del self
 	-fonction __del__() avec juste pass dedans
-
-
 -4 types d'environnement (juste de la déco, pas d'effets spéciaux) :
 	-blue   : tree_winter 1+2
 	-brown  : tree_automn 1+2
@@ -43,13 +40,8 @@ les plaques, des arbres, fleurs ou herbes qui changent suivant la saison du jeu
 	--> pour générer un environnement : season=seasons[game.season]
 										environnement = season[random.randint(0,len(season))]
 										instancier la classe ENVIRONNMENT avec le type défini juste au dessus, et les autres paramètres, cf fonction update(), 1ere condition dans platform
-
-
-
 ETIENNE:
-
 A RÉPARTIR :
-
 """
  
 """
