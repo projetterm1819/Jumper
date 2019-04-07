@@ -3,9 +3,14 @@
 #####Dernières modifs : 7 avril a 14h53, Loïs
 """ 
 """
-#####TASKLIST :
--LOIS:
--scoring, OK
+#######################################################################################################################
+#####TASKLIST :########################################################################################################
+#######################################################################################################################
+
+LOIS:#################################################################################################################
+#######################################################################################################################
+
+-scoring
 -menu tkinter, lier le menu dans la boucle principale OK
 -plaque de debut, qui fait que le joueur ne tombe pas direct
 -aleatoire organise : 
@@ -40,12 +45,17 @@ les plaques, des arbres, fleurs ou herbes qui changent suivant la saison du jeu
 	--> pour generer un environnement : season=seasons[game.season]
 										environnement = season[random.randint(0,len(season))]
 										instancier la classe ENVIRONNMENT avec le type defini juste au dessus, et les autres paramètres, cf fonction update(), 1ere condition dans platform
-ETIENNE:
-A RÉPARTIR :
+ETIENNE:###############################################################################################################
+#######################################################################################################################
+
+A RÉPARTIR :###########################################################################################################
+#######################################################################################################################
 """
  
 """
-#####Problèmes rencontres dans le jeu, a debuguer par quelqu'un :
+#######################################################################################################################
+#####Problèmes rencontrés dans le jeu, a débuguer par quelqu'un :######################################################
+#######################################################################################################################
 -on voit pu trop les symboles des joueurs
 -1 symbole sans transparence et mal dimensionne
 -mort du joueur
@@ -765,4 +775,5 @@ while Game:
 
 	ScreenDisplay()
 	pygame.time.wait(1)
+
 pygame.quit()
