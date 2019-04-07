@@ -3,7 +3,7 @@ import subprocess as sp
 
 def launchGame():
 	sp.Popen(("python","projet2.py")) 
-	exit()
+	ScreenMenu.destroy()
 
 
 ScreenMenu = Tk()
