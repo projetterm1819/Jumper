@@ -5,7 +5,8 @@
 """
 #####TASKLIST :
 -LOIS:
--scoring, menu tkinter, lier le menu dans la boucle principale
+-scoring,
+-menu tkinter, lier le menu dans la boucle principale OK
 -plaque de début, qui fait que le joueur ne tombe pas direct
 -aléatoire organisé : 
 	régles :-pas 2 plateformes qui se superposent
@@ -175,6 +176,7 @@ class PLAYER(pygame.sprite.Sprite): #Tout ce qui concerne le joueur
 
 		if self.posY>height_screen: #!!!juste pour le debug
 			self.posY = 0
+			self.isDead()
 
 		if self.imageNumber > 5:
 			self.imageNumber = 0
@@ -697,7 +699,7 @@ for i in range(5):
 ########################################################################################################################
 while Game:
 	while inMenu:
-		subprocess.Popen(("python","Menu.py")) #Boucle de Menu
+		subprocess.Popen(("python","LauncherMenu.py")) #Boucle de Menu
 		exit()
 
 	while inGame:
