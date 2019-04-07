@@ -1,11 +1,6 @@
 # -*-coding:utf-8 -*-
 """
-#####Dernières modifs : 7 avril a 14h57, ETIENNE
-###Quoi de neuf?
--de l'eau
--un code + propre
--un futur environnement? quelques variables déja prêtes
-
+#####Dernières modifs : 7 avril a 14h53, Loïs
 """ 
 """
 #####TASKLIST :
@@ -16,7 +11,6 @@
 	régles :-pas 2 plateformes qui se superposent
 			-pas 2 plateformes l'une juste au dessus de l'autre
 			-pas plus de 4 ou 3 hauteurs de différence de hauteur entre 2 plateformes
-
 Le prof voulait des trucs intelligents? ca me semble bien ca :
 les plaques, des arbres, fleurs ou herbes qui changent suivant la saison du jeu
 -créer une class environnement
@@ -28,8 +22,6 @@ les plaques, des arbres, fleurs ou herbes qui changent suivant la saison du jeu
 	-dans update() : juste bouger la plateforme en x et en y avec le rect en prenant la pos de la plateforme+la pos de l'env 
 	-fontion delete() où on dégage de la liste env_objects et où on del self
 	-fonction __del__() avec juste pass dedans
-
-
 -4 types d'environnement (juste de la déco, pas d'effets spéciaux) :
 	-blue   : tree_winter 1+2
 	-brown  : tree_automn 1+2
@@ -47,13 +39,8 @@ les plaques, des arbres, fleurs ou herbes qui changent suivant la saison du jeu
 	--> pour générer un environnement : season=seasons[game.season]
 										environnement = season[random.randint(0,len(season))]
 										instancier la classe ENVIRONNMENT avec le type défini juste au dessus, et les autres paramètres, cf fonction update(), 1ere condition dans platform
-
-
-
 ETIENNE:
-
 A RÉPARTIR :
--quand on a plus de 9 pièces on fait quoi? bonus? objet? bonus score?
 """
  
 """
@@ -67,15 +54,15 @@ A RÉPARTIR :
 #IMPORTATIONS###########################################################################################################
 ########################################################################################################################
 
-import pygame, os, numpy as np,time, random, math, cProfile
-from pygame.locals import*
+import pygame, os, numpy as np,time, random, math, cProfile,subprocess
+from pygame.locals import* 
 
 #INITIALISATIONS DE LA FENETRE ET PYGAME
 pygame.init() #Youhouuu installe toi, le jeu commence
 py_info = pygame.display.Info() #1366/768 dimensions écran etienne
 width_screen,height_screen=1366,768
 pygame.display.set_caption("Jumper")
-os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (0,int(3.5/100*height_screen))#placement de la fenetre par rapport au top left
+os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (0,54)#placement de la fenetre par rapport au top left
 screen = pygame.display.set_mode((int(width_screen),int(height_screen-3.5/100*height_screen)))
 
 pygame.key.set_repeat(70,5) #set_repeat(delay,interval)
@@ -648,12 +635,12 @@ def ScreenDisplay(): #on update l'ecran
 	#Group.update() appelle la fonction update de tous les membres du groupe
 	#Group.draw(screen) dessine chaque sprite à l'écran avec son rect et son image sur le screen
 	ALLTYPES = {platforms,enemies,coins,discs,playerGroup,powerups,env_objects}
-	pygame.draw.rect(screen,(196,233,242),player.bubbleRect) #effacer la bulle
-	clouds.clear(screen,background)
-	for Type in ALLTYPES:
-	    Type.clear(screen,background)
+	# pygame.draw.rect(screen,(196,233,242),player.bubbleRect) #effacer la bulle
+	# clouds.clear(screen,background)
+	# for Type in ALLTYPES:
+	#     Type.clear(screen,background)
 
-	# screen.fill((196,233,242))
+	screen.fill((196,233,242))
 	game.UI() #on update l'UI
 
 	clouds.update()
@@ -702,8 +689,8 @@ for i in range(5):
 ########################################################################################################################
 while Game:
 	while inMenu:
-		print("menu")
-		#a toi d'ajouter ton menu ici, ou un lien vers le programme menu
+		subprocess.Popen(("python","Menu.py")) #Boucle de Menu
+		exit()
 
 	while inGame:
 
@@ -714,13 +701,15 @@ while Game:
 
 		for event in pygame.event.get(): #pile des évènements
 			if event.type == QUIT or event.type==KEYDOWN and event.key == K_ESCAPE: #on quitte le jeu
-				inMenu = False
-				Game = False
+				inMenu = True
 				inGame = False
-				print ("Distance = "+str(player.distance)+" px") #debug
 
 			if event.type == KEYDOWN:
-				player.XForce += player.speed*((event.key == K_RIGHT)-(event.key == K_LEFT))
+				if event.key == K_LEFT:
+					player.XForce -= player.speed
+				elif event.key == K_RIGHT:
+					player.XForce += player.speed
+
 
 				if event.key == K_UP and player.YForce == 0: #on saute si on n'est pas déja en train de sauter
 					player.isJumping = True
