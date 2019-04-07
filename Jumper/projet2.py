@@ -217,14 +217,14 @@ class PLAYER(pygame.sprite.Sprite): #Tout ce qui concerne le joueur
 		#print(self.YForce)
 
 	def move(self):
-		# self.instantspeed= int(self.speed*self.way)
 		self.posX += self.XForce    #deplacement latéral
+		self.distance+=self.XForce
 
 
 	def Jump(self):
 		self.posY-=self.YForce
-		# if self.instantspeed != 0:
-		   # self.posX+=self.instantspeed
+		if self.instantspeed != 0:
+		   	self.posX+=self.instantspeed
 		self.YForce -= self.g*self.playersMass[player.player] #YForce est positive puis négative
 
 	def Fall(self): #quand t'as pas les pieds sur terre..
@@ -703,7 +703,9 @@ while Game:
 
 	for event in pygame.event.get(): #pile des évènements
 		if event.type == QUIT or event.type==KEYDOWN and event.key == K_ESCAPE: #on quitte le jeu
-			#with open("Files/Score","w") as file:
+			score=str(int(player.distance/1366))
+			with open("Files/Score","w") as file:
+				file.write(score)
 			Menu()
 
 		if event.type == KEYDOWN:
