@@ -5,7 +5,7 @@
 """
 #####TASKLIST :
 -LOIS:
--scoring,
+-scoring, OK
 -menu tkinter, lier le menu dans la boucle principale OK
 -plaque de début, qui fait que le joueur ne tombe pas direct
 -aléatoire organisé : 
@@ -298,8 +298,22 @@ class GAME():
 		symbol = self.symboles[player.player]
 		if symbol:
 			screen.blit(symbol,(10,height_screen-50))
+########################################################################################################################
+#Environnement##########################################################################################################
+########################################################################################################################
+class ENVIRONNEMENT():
+	def __init__(self,x,y,platform):
+		#GLOBAL
+		self.platform = platform
+		self.x = x
+		self.y = y
 
+		#IMAGES
+		self.image = pygame.image.load("ENVIRONNEMENT/springsummer/tree1.png").convert_alpha()
 
+	def update(self):
+		self.rect.x = self.platform.posX + self.x
+		self.rect.y = self.platform.posY*int(height_screen/15) - self.y
 ########################################################################################################################
 #Plateformes qui se déplacent###########################################################################################
 ########################################################################################################################
@@ -319,6 +333,7 @@ class PLATFORM(pygame.sprite.Sprite):
 		self.enemy = None
 		self.coin = None
 		self.powerup = None
+		self.environnement = None
 
 		#COLLISIONS
 		self.rect = self.image.get_rect().inflate(10,0) #on grossit de 5px de chaque coté le rect pour améliorer la détection des collisions
