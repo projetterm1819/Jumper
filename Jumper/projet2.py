@@ -168,7 +168,7 @@ class PLAYER(pygame.sprite.Sprite): #Tout ce qui concerne le joueur
 
 		if self.posY>height_screen: #!!!juste pour le debug
 			self.posY = 0
-			self.isDead()
+			self.lives-=1
 
 		if self.imageNumber > 5:
 			self.imageNumber = 0
@@ -247,8 +247,9 @@ class PLAYER(pygame.sprite.Sprite): #Tout ce qui concerne le joueur
 			fpsClock.tick(FPS)
 			pygame.time.wait(1)
 
-		inGame = False  #on quitte le jeu, direction le menu
 		inMenu = True
+		inGame = False  #on quitte le jeu, direction le menu
+		
 
 ########################################################################################################################
 #le jeu, l'UI###########################################################################################################
