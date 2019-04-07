@@ -3,12 +3,12 @@ import subprocess as sp
 
 def launchGame():
 	sp.Popen(("python","projet2.py")) 
-	exit()
+	ScreenMenu.destroy()
 
 
 ScreenMenu = Tk()
 ScreenMenu.title('Jumper')
-ScreenMenu.geometry("1366x741+0+27")
+ScreenMenu.geometry("1366x741")
 w=1366
 h=741
 ScreenMenu.resizable(width=False,height=False)
