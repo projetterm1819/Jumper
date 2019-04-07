@@ -648,12 +648,12 @@ def ScreenDisplay(): #on update l'ecran
 	#Group.update() appelle la fonction update de tous les membres du groupe
 	#Group.draw(screen) dessine chaque sprite à l'écran avec son rect et son image sur le screen
 	ALLTYPES = {platforms,enemies,coins,discs,playerGroup,powerups,env_objects}
-	# pygame.draw.rect(screen,(196,233,242),player.bubbleRect) #effacer la bulle
-	# clouds.clear(screen,background)
-	# for Type in ALLTYPES:
-	#     Type.clear(screen,background)
+	pygame.draw.rect(screen,(196,233,242),player.bubbleRect) #effacer la bulle
+	clouds.clear(screen,background)
+	for Type in ALLTYPES:
+	    Type.clear(screen,background)
 
-	screen.fill((196,233,242))
+	# screen.fill((196,233,242))
 	game.UI() #on update l'UI
 
 	clouds.update()
