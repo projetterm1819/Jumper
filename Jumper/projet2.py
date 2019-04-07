@@ -63,7 +63,7 @@ pygame.init() #Youhouuu installe toi, le jeu commence
 py_info = pygame.display.Info() #1366/768 dimensions écran etienne
 width_screen,height_screen=1366,768
 pygame.display.set_caption("Jumper")
-os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (0,54)#placement de la fenetre par rapport au top left
+os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (0,int(3.5/100*height_screen))#placement de la fenetre par rapport au top left
 screen = pygame.display.set_mode((int(width_screen),int(height_screen-3.5/100*height_screen)))
 
 pygame.key.set_repeat(70,5) #set_repeat(delay,interval)
