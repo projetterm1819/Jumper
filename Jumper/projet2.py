@@ -84,7 +84,8 @@ Game = True #--->Le jeu tourne
 proba_powerup = 20
 proba_coin = 10
 proba_enemy = 10
-proba_environnement = 5
+proba_arbre = 5
+proba_feuille = 3
 
 sprite_numbers = ["1","2","3","4","Dead","DeadFall"] #1,2,3 et 4 sont des sprites quand le player marche
 sprite_type = ["walk","walk","walk","walk","",""]
@@ -313,7 +314,7 @@ class GAME():
 #Environnement##########################################################################################################
 ########################################################################################################################
 class ENVIRONNEMENT(pygame.sprite.Sprite):
-	def __init__(self,specimen,modèle,x,y,platform):
+	def __init__(self,biome,modele,x,y,platform):
 		pygame.sprite.Sprite.__init__(self)
 		#GLOBAL
 		self.platform = platform
@@ -321,7 +322,7 @@ class ENVIRONNEMENT(pygame.sprite.Sprite):
 		self.y = y
 
 		#IMAGES
-		self.image = pygame.image.load(ENV+specimen+modèle).convert_alpha()
+		self.image = pygame.image.load(ENV+biome+modele).convert_alpha()
 		self.rect = self.image.get_rect()
 
 	def update(self):
@@ -384,9 +385,13 @@ class PLATFORM(pygame.sprite.Sprite):
 				powerup = POWERUP(50,50,self)
 				powerups.add(powerup)
 				self.powerup = powerup
-			elif random.randint(0,proba_environnement)==1:
-				Artefact = ENVIRONNEMENT(["Spring Summer/","Autumn/","Winter/"][random.randint(0,2)],["tree1.png","tree2.png"] [random.randint(0,1)],random.randint(0,(self.size-1)*64),104,self)
-				decors.add(Artefact)
+			if random.randint(0,proba_arbre)==1:
+				Arbre = ENVIRONNEMENT(["Spring Summer/","Autumn/","Winter/"][random.randint(0,2)],["tree1.png","tree2.png"] [random.randint(0,1)],random.randint(0,(self.size-1)*64),104,self)
+				decors.add(Arbre)
+			if random.randint(0,proba_feuille)==1:
+				feuille = ENVIRONNEMENT("Spring Summer/",["flowerB.png","flowerP.png","grass1.png","grass2.png","grass3.png"] [random.randint(0,4)],random.randint(0,(self.size-1)*64),57,self)
+				decors.add(feuille)
+
 		self.t+=0.01
 		if self.t>self.time: #si le temps est ecoule, on arrive à l'ecran
 			self.posX -= globalSpeed
