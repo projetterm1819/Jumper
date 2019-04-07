@@ -647,7 +647,8 @@ def ScreenDisplay(): #on update l'ecran
     # clouds.clear(screen,background)
     # for Type in ALLTYPES:
     #     Type.clear(screen,background)
-    screen.blit(background,(0,0))
+
+    screen.fill((196,233,242))
     game.UI() #on update l'UI
 
     clouds.update()
