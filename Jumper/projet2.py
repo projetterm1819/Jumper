@@ -70,10 +70,7 @@ pygame.key.set_repeat(70,5) #set_repeat(delay,interval)
 pygame.display.update() #application des parametres d'affichage de la fenetre
 
 #INITIALISATION DES VARIABLES
-Game = True #--->Le programme est en fonction
-inGame = True #If inGame, then not inMenu
-inMenu = False #If inMenu, then not inGame :)
-
+Game = True #--->Le jeu tourne
 proba_powerup = 20
 proba_coin = 10
 proba_enemy = 10
@@ -247,8 +244,8 @@ class PLAYER(pygame.sprite.Sprite): #Tout ce qui concerne le joueur
 			fpsClock.tick(FPS)
 			pygame.time.wait(1)
 
-		inMenu = True
-		inGame = False  #on quitte le jeu, direction le menu
+		Menu()
+		Game = False  #on quitte le jeu, direction le menu
 		
 
 ########################################################################################################################
@@ -660,7 +657,13 @@ def ScreenDisplay(): #on update l'ecran
 		screen.blit(water_top,(x*64,576))
 	pygame.display.update() #maj de l'écran
 
+########################################################################################################################
+#Ouverture Menu###############################################################################################
+########################################################################################################################
 
+def Menu():
+	subprocess.Popen(("python","LauncherMenu.py")) #Boucle de Menu
+	pygame.quit()
 
 ########################################################################################################################
 #Instanciation des objets###############################################################################################
@@ -691,61 +694,54 @@ for i in range(5):
 #BOUCLE PRINCIPALE######################################################################################################
 ########################################################################################################################
 while Game:
-	while inMenu:
-		subprocess.Popen(("python","LauncherMenu.py")) #Boucle de Menu
-		exit()
-
-	while inGame:
-
-		fpsClock.tick(FPS)
-
-		player.move()
-		player.XForce += (player.XForce<0)*player.speed*1/3 - (player.XForce>0)*player.speed*1/3
-
-		for event in pygame.event.get(): #pile des évènements
-			if event.type == QUIT or event.type==KEYDOWN and event.key == K_ESCAPE: #on quitte le jeu
-				inMenu = True
-				inGame = False
-
-			if event.type == KEYDOWN:
-				if event.key == K_LEFT:
-					player.XForce -= player.speed
-				elif event.key == K_RIGHT:
-					player.XForce += player.speed
 
 
-				if event.key == K_UP and player.YForce == 0: #on saute si on n'est pas déja en train de sauter
-					player.isJumping = True
-					if player.player=="player_Green":
-						player.YForce = 5
-						player.g = 0.029
-					else:
-						player.YForce = 3
-						player.g = 0.03
+	fpsClock.tick(FPS)
+
+	player.move()
+	player.XForce += (player.XForce<0)*player.speed*1/3 - (player.XForce>0)*player.speed*1/3
+
+	for event in pygame.event.get(): #pile des évènements
+		if event.type == QUIT or event.type==KEYDOWN and event.key == K_ESCAPE: #on quitte le jeu
+			#with open("Files/Score","w") as file:
+			Menu()
+
+		if event.type == KEYDOWN:
+			if event.key == K_LEFT:
+				player.XForce -= player.speed
+			elif event.key == K_RIGHT:
+				player.XForce += player.speed
 
 
-				if event.key == K_DOWN and player.YForce>0:
-					player.YForce = -1/(height_screen/768) #YForce<0 donc phase de chute, on donne -1 pour qu'il ait déja une vitesse de chute
-				if event.key == K_SPACE and player.player=="player_Grey" and len(discs)<1: #une attaque de grey à la fois
-					disc = DISC()
-					discs.add(disc)
-
-				if event.key == K_TAB: #changer de joueur
-					pygame.key.set_repeat(70,5) #(delay,interval)
-					if player.player == "player_Red":
-						player.player = player.players[0]
-					else:
-						player.player = player.players[player.players.index(player.player)+1]
-				if event.key == K_h: #juste pour le debug
-					player.lives -= 1
-				if event.key == K_j:
-					player.lives += 1
-					inGame = False
-					inMenu = True
+			if event.key == K_UP and player.YForce == 0: #on saute si on n'est pas déja en train de sauter
+				player.isJumping = True
+				if player.player=="player_Green":
+					player.YForce = 5
+					player.g = 0.029
+				else:
+					player.YForce = 3
+					player.g = 0.03
 
 
-		ScreenDisplay()
-		pygame.time.wait(1)
+			if event.key == K_DOWN and player.YForce>0:
+				player.YForce = -1/(height_screen/768) #YForce<0 donc phase de chute, on donne -1 pour qu'il ait déja une vitesse de chute
+			if event.key == K_SPACE and player.player=="player_Grey" and len(discs)<1: #une attaque de grey à la fois
+				disc = DISC()
+				discs.add(disc)
+
+			if event.key == K_TAB: #changer de joueur
+				pygame.key.set_repeat(70,5) #(delay,interval)
+				if player.player == "player_Red":
+					player.player = player.players[0]
+				else:
+					player.player = player.players[player.players.index(player.player)+1]
+			if event.key == K_h: #juste pour le debug
+				player.lives -= 1
+			if event.key == K_j:
+				player.lives += 1
+				Game = False
 
 
+	ScreenDisplay()
+	pygame.time.wait(1)
 pygame.quit()
