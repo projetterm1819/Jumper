@@ -12,7 +12,7 @@ LOIS:###########################################################################
 #######################################################################################################################
 
 -scoring
--menu tkinter, lier le menu dans la boucle principale OK
+-menu tkinter, lier le menu dans la boucle principale
 -plaque de debut, qui fait que le joueur ne tombe pas direct
 -aleatoire organise : 
 	regles :-pas 2 plateformes qui se superposent
@@ -87,10 +87,18 @@ Game = True #--->Le jeu tourne
 proba_powerup = 20
 proba_coin = 10
 proba_enemy = 10
-proba_environnement = 5
+proba_tree = 5
+proba_grass = 5
 
 sprite_numbers = ["1","2","3","4","Dead","DeadFall"] #1,2,3 et 4 sont des sprites quand le player marche
 sprite_type = ["walk","walk","walk","walk","",""]
+
+seasons = ['Winter','Autumn','Spring Summer']
+GeneratedSeason=seasons[2]
+lenBiome = random.randint(5,10)
+global platformCount
+platformCount = 0
+
 
 FPS = 300
 sens = random.randint(0,1) #Pour sens=0, les nuages vont a droite,sinon, a gauche
@@ -113,6 +121,7 @@ UI="IMAGES/UI/"
 NUMBERS="IMAGES/UI/NUMBERS/"
 OBJECTS="IMAGES/OBJECTS/"
 ENV = "IMAGES/ENVIRONNEMENT/"
+TIL = "IMAGES/tiles/"
 
 
 ########################################################################################################################
@@ -179,7 +188,7 @@ class PLAYER(pygame.sprite.Sprite): #Tout ce qui concerne le joueur
 
 		if self.posY>height_screen: #!!!juste pour le debug
 			self.posY = 0
-			self.lives-=1
+		#	self.lives-=1
 
 		if self.imageNumber > 5:
 			self.imageNumber = 0
@@ -315,8 +324,8 @@ class GAME():
 ########################################################################################################################
 #Environnement##########################################################################################################
 ########################################################################################################################
-class ENVIRONNEMENT(pygame.sprite.Sprite):
-	def __init__(self,specimen,modèle,x,y,platform):
+class environment(pygame.sprite.Sprite):
+	def __init__(self,biome,modele,x,y,platform):
 		pygame.sprite.Sprite.__init__(self)
 		#GLOBAL
 		self.platform = platform
@@ -324,24 +333,43 @@ class ENVIRONNEMENT(pygame.sprite.Sprite):
 		self.y = y
 
 		#IMAGES
-		self.image = pygame.image.load(ENV+specimen+modèle).convert_alpha()
+		self.image = pygame.image.load(ENV+biome+modele).convert_alpha()
 		self.rect = self.image.get_rect()
 
 	def update(self):
 		self.rect.x = self.platform.posX + self.x
 		self.rect.y = self.platform.posY*int(height_screen/15) - self.y
+
+	def delete(self):
+		decors.remove(self)
+		del self
+
+	def __del__(self):
+		pass
 ########################################################################################################################
 #Plateformes qui se deplacent###########################################################################################
 ########################################################################################################################
 class PLATFORM(pygame.sprite.Sprite):
-	def __init__(self,time,size,y,platform_model="tiles/green/1.png"):
+	def __init__(self,time,size,y,season):
 		pygame.sprite.Sprite.__init__(self)
 		#PARAMETERS
 		self.time = time #le temps d'arrivee à l'ecran !!on modifiera
 		self.size = size #la longueur
 		self.t = 0
+		self.season = season
+		self.image = pygame.image.load(TIL+str(self.season)+"/"+str(self.size)+".png").convert_alpha()
+
 		#IMAGE
-		self.image = pygame.image.load("IMAGES/tiles/green/"+str(self.size)+".png").convert_alpha()
+		'''for season in self.seasons: #Pour chacune des couleurs de personnage
+			for size in self.adegager: #Pour chacune des sprites par couleur
+				image = str("IMAGES/tiles/"+season+"/"+size+".png")
+				setattr(self,"image"+season+str(self.size),pygame.image.load(image).convert_alpha())
+
+		self.image = self.image+str(self.season)+str(self.size)+".png"
+
+		self.imagesSpringSummer = [self.imageSpringSummer1,self.imageSpringSummer2,self.imageSpringSummer3,self.imageSpringSummer4,self.imageSpringSummer5]
+		self.imagesWinter = [self.imageWinter1,self.imageWinter2,self.imageWinter3,self.imageWinter4,self.Winter5]
+		self.imagesAutumn = [self.imageAutumn1,self.imageAutumn2,self.imageAutumn3,self.imageAutumn4,self.imageAutumn5]'''
 
 		#GLOBAL
 		self.posX = width_screen
@@ -349,8 +377,9 @@ class PLATFORM(pygame.sprite.Sprite):
 		self.enemy = None
 		self.coin = None
 		self.powerup = None
-		self.Artefact = None
-
+		self.tree = None
+		self.grass = None
+		self.decors = None
 		#COLLISIONS
 		self.rect = self.image.get_rect().inflate(10,0) #on grossit de 5px de chaque cote le rect pour ameliorer la detection des collisions
 		self.rect.x = self.posX
@@ -359,10 +388,13 @@ class PLATFORM(pygame.sprite.Sprite):
 
 	def update(self):
 		if self.posX < -64*self.size:
+			global platformCount
+			platformCount+=1
 			self.posX = width_screen
 			self.posY = random.randint(5,10)
 			self.size = random.randint(2,5)
-			self.image = pygame.image.load("IMAGES/tiles/green/"+str(self.size)+".png").convert_alpha()
+			self.season = GeneratedSeason
+			self.image = pygame.image.load(TIL+str(self.season)+"/"+str(self.size)+".png").convert_alpha()
 			self.rect = self.image.get_rect().inflate(10,0)
 			if self.powerup:
 					self.powerup.delete()
@@ -373,7 +405,15 @@ class PLATFORM(pygame.sprite.Sprite):
 			if self.coin:
 					self.coin.delete()
 					self.coin = None
-
+			if self.tree:
+					self.tree.delete()
+					self.tree = None
+			if self.grass:
+					self.grass.delete()
+					self.grass = None
+			if self.decors:
+					self.decors.delete()
+					self.decors = None
 
 			if random.randint(0,proba_enemy)==1 and len(enemies)<=2: #nouvel ennemi si y'en a au max 3 sur l'ecran
 				enemy = ENEMY(["Flying","Walking","Floating"][random.randint(0,2)],random.randint(0,(self.size-1)*64),42,self)
@@ -387,9 +427,15 @@ class PLATFORM(pygame.sprite.Sprite):
 				powerup = POWERUP(50,50,self)
 				powerups.add(powerup)
 				self.powerup = powerup
-			elif random.randint(0,proba_environnement)==1:
-				Artefact = ENVIRONNEMENT(["Spring Summer/","Autumn/","Winter/"][random.randint(0,2)],["tree1.png","tree2.png"] [random.randint(0,1)],random.randint(0,(self.size-1)*64),104,self)
-				decors.add(Artefact)
+			if random.randint(0,proba_tree)==1:
+				tree = environment(["Spring Summer/","Autumn/","Winter/"][random.randint(0,2)],["tree1.png","tree2.png"] [random.randint(0,1)],random.randint(0,(self.size-1)*64),104,self)
+				decors.add(tree)
+				self.tree = tree
+			if random.randint(0,proba_grass)==1:
+				grass = environment("Spring Summer/",["flowerB.png","flowerP.png","grass1.png","grass2.png","grass3.png"] [random.randint(0,4)],random.randint(0,(self.size-1)*64),57,self)
+				decors.add(grass)
+				self.grass = grass
+
 		self.t+=0.01
 		if self.t>self.time: #si le temps est ecoule, on arrive à l'ecran
 			self.posX -= globalSpeed
@@ -667,11 +713,6 @@ def ScreenDisplay(): #on update l'ecran
 	#Group.update() appelle la fonction update de tous les membres du groupe
 	#Group.draw(screen) dessine chaque sprite à l'ecran avec son rect et son image sur le screen
 	ALLTYPES = {platforms,enemies,coins,discs,playerGroup,powerups,decors}
-	# pygame.draw.rect(screen,(196,233,242),player.bubbleRect) #effacer la bulle
-	# clouds.clear(screen,background)
-	# for Type in ALLTYPES:
-	#     Type.clear(screen,background)
-
 	screen.fill((196,233,242))
 	game.UI() #on update l'UI
 
@@ -681,12 +722,8 @@ def ScreenDisplay(): #on update l'ecran
 		Type.update()
 		Type.draw(screen)
 
-	for x in range(22):
-		screen.blit(water,(x*64,704))
-	for x in range(22):
-		screen.blit(water,(x*64,640))
-	for x in range(22):
-		screen.blit(water_top,(x*64,576))
+	screen.blit(water,(0,576))
+
 	pygame.display.update() #maj de l'ecran
 
 ########################################################################################################################
@@ -705,11 +742,10 @@ player = PLAYER()
 game = GAME()
 fpsClock = pygame.time.Clock()
 
-background = pygame.image.load("IMAGES/background.png").convert_alpha()
-water = pygame.image.load("IMAGES/fluidBlue.png").convert_alpha()
-water_top = pygame.image.load("IMAGES/fluidBlue_top.png").convert_alpha()
+water = pygame.image.load("IMAGES/water.png").convert_alpha()
 
-screen.blit(background,(0,0))
+
+
 
 for i in range(random.randint(10,20)): #instanciation des nuages pour le fond
 	cloud = CLOUD(random.randint(0,width_screen),random.randint(0,height_screen*2/3),random.randint(8,15)) #(x,y,speed)
@@ -717,9 +753,12 @@ for i in range(random.randint(10,20)): #instanciation des nuages pour le fond
 
 
 for i in range(5):
-	size = random.randint(4,5)
-	platform = PLATFORM(i*3,size,random.randint(5,10))
+	size = random.randint(2,5)
+	platform = PLATFORM(i*3,size,random.randint(5,10),GeneratedSeason)
 	platforms.add(platform)
+	platformCount+=1
+
+
 
 
 ########################################################################################################################
@@ -732,6 +771,11 @@ while Game:
 
 	player.move()
 	player.XForce += (player.XForce<0)*player.speed*1/3 - (player.XForce>0)*player.speed*1/3
+	if platformCount == lenBiome:
+		lenBiome = random.randint(5,10)
+		platformCount = 0
+		GeneratedSeason = seasons[random.randint(0,2)]
+		print(str(platformCount)+" ... "+GeneratedSeason)
 
 	for event in pygame.event.get(): #pile des evènements
 		if event.type == QUIT or event.type==KEYDOWN and event.key == K_ESCAPE: #on quitte le jeu
