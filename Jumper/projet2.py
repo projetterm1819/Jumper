@@ -713,6 +713,11 @@ def ScreenDisplay(): #on update l'ecran
 	#Group.update() appelle la fonction update de tous les membres du groupe
 	#Group.draw(screen) dessine chaque sprite à l'ecran avec son rect et son image sur le screen
 	ALLTYPES = {platforms,enemies,coins,discs,playerGroup,powerups,decors}
+	# pygame.draw.rect(screen,(196,233,242),player.bubbleRect) #effacer la bulle
+	# clouds.clear(screen,background)
+	# for Type in ALLTYPES:
+	#     Type.clear(screen,background)
+
 	screen.fill((196,233,242))
 	game.UI() #on update l'UI
 
@@ -722,8 +727,12 @@ def ScreenDisplay(): #on update l'ecran
 		Type.update()
 		Type.draw(screen)
 
-	screen.blit(water,(0,576))
-
+	for x in range(22):
+		screen.blit(water,(x*64,704))
+	for x in range(22):
+		screen.blit(water,(x*64,640))
+	for x in range(22):
+		screen.blit(water_top,(x*64,576))
 	pygame.display.update() #maj de l'ecran
 
 ########################################################################################################################
@@ -742,8 +751,11 @@ player = PLAYER()
 game = GAME()
 fpsClock = pygame.time.Clock()
 
-water = pygame.image.load("IMAGES/water.png").convert_alpha()
+background = pygame.image.load("IMAGES/background.png").convert_alpha()
+water = pygame.image.load("IMAGES/fluidBlue.png").convert_alpha()
+water_top = pygame.image.load("IMAGES/fluidBlue_top.png").convert_alpha()
 
+screen.blit(background,(0,0))
 
 
 

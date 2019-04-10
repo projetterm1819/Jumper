@@ -8,7 +8,7 @@ def launchGame():
 
 ScreenMenu = Tk()
 ScreenMenu.title('Jumper')
-ScreenMenu.geometry("1366x741")
+ScreenMenu.geometry("1366x741+0+0")
 w=1366
 h=741
 ScreenMenu.resizable(width=False,height=False)
