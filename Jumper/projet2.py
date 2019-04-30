@@ -315,7 +315,10 @@ class PLATFORM(pygame.sprite.Sprite):
 				platformCount = 0
 				GeneratedSeason = seasons[random.randint(0,3)]
 			self.posX = width_screen
-			self.posY = random.randint(5,10)
+			self.posY = 5
+			while game.lastplatform[1]-self.posY<4:
+				self.posY = random.randint(5,10)
+			game.lastplatform = [self.posX,self.posY]
 			self.size = random.randint(2,5)
 			self.season = GeneratedSeason
 			self.image = pygame.image.load(TILES+str(self.season)+"/"+str(self.size)+".png").convert_alpha()
@@ -690,7 +693,8 @@ class GAME():
 		self.animationCoin = [self.coin1,self.coin2,self.coin3,self.coin4,self.coin5,self.coin6]
 		self.animNumber = 0
 		self.imgCoin = self.animationCoin[self.animNumber]
-
+		#GESTION PLATFORM
+		self.lastplatform = [0,0]
 
 	def UI(self):
 		x = 60
@@ -799,6 +803,7 @@ while game.GAME:
 
 		if event.type == QUIT or event.type==KEYDOWN and event.key == K_ESCAPE or game.GAME==False: #on quitte le jeu
 			score=str(int(player.distance/1366))
+			print(score)
 			with open("Files/Score.txt","w") as file:
 				file.write(score)
 			game.Menu()

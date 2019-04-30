@@ -22,9 +22,9 @@ ScreenMenu.bind('<Escape>',exit)
 
 with open("Files/Score.txt","r") as file:
 	score = file.read()
-Background.create_text(1366/2,741/2,text="Score : "+score)
+Background.create_text(840,290,text="Dernier score : "+score,fill="#fff")
 ButtonPicture= PhotoImage(file='titre.png')
 Bouton = Button(image=ButtonPicture, command = launchGame)
-Bouton.place(bordermode=OUTSIDE, height=76, width=512,x=423,y=226)
+Bouton.place(bordermode=OUTSIDE, height=76, width=512,x=400,y=148)
 ScreenMenu.mainloop()
 
