@@ -315,10 +315,9 @@ class PLATFORM(pygame.sprite.Sprite):
 				platformCount = 0
 				GeneratedSeason = seasons[random.randint(0,3)]
 			self.posX = width_screen
-			self.posY = 5
-			while game.lastplatform[1]-self.posY<4:
+			while game.lastPlatformY-self.posY > 4 or self.posY == game.lastPlatformY:
 				self.posY = random.randint(5,10)
-			game.lastplatform = [self.posX,self.posY]
+			game.lastPlatformY = self.posY
 			self.size = random.randint(2,5)
 			self.season = GeneratedSeason
 			self.image = pygame.image.load(TILES+str(self.season)+"/"+str(self.size)+".png").convert_alpha()
@@ -434,7 +433,6 @@ class DISC(pygame.sprite.Sprite):
 ########################################################################################################################
 #Types : Flying, Walking, Floating######################################################################################
 ########################################################################################################################
-
 class ENEMY(pygame.sprite.Sprite):
 	def __init__(self,EnemyType,x,y,platform):
 		pygame.sprite.Sprite.__init__(self)
@@ -677,6 +675,8 @@ class GAME():
 	def __init__(self):
 		#GESTION GLOBALE
 		self.GAME = True
+		self.lastPlatformY = 0
+
 		#IMAGES
 		#VIES
 		self.heartFull = pygame.image.load(UI+"heartFull.png").convert_alpha() #chargement des images pour l'UI
@@ -693,8 +693,7 @@ class GAME():
 		self.animationCoin = [self.coin1,self.coin2,self.coin3,self.coin4,self.coin5,self.coin6]
 		self.animNumber = 0
 		self.imgCoin = self.animationCoin[self.animNumber]
-		#GESTION PLATFORM
-		self.lastplatform = [0,0]
+
 
 	def UI(self):
 		x = 60
@@ -803,7 +802,6 @@ while game.GAME:
 
 		if event.type == QUIT or event.type==KEYDOWN and event.key == K_ESCAPE or game.GAME==False: #on quitte le jeu
 			score=str(int(player.distance/1366))
-			print(score)
 			with open("Files/Score.txt","w") as file:
 				file.write(score)
 			game.Menu()
