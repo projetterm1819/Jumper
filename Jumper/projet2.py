@@ -55,7 +55,7 @@ proba_grass = 2
 #système de saisons
 seasons = ['Winter','Autumn','Spring','Summer']
 GeneratedSeason=seasons[random.randint(0,3)]
-lenBiome = random.randint(10,20)
+lenBiome = random.randint(5,10)
 platformCount = 0
 
 
@@ -79,11 +79,17 @@ animations = pygame.sprite.RenderUpdates()
 playerGroup = pygame.sprite.RenderUpdates() #juste le joueur
 
 #repertoires des images
-UI="IMAGES/UI/"
-NUMBERS="IMAGES/UI/NUMBERS/"
-OBJECTS="IMAGES/OBJECTS/"
+UI = "IMAGES/UI/"
+NUMBERS = "IMAGES/UI/NUMBERS/"
+OBJECTS = "IMAGES/OBJECTS/"
 ENV = "IMAGES/ENVIRONNEMENT/"
 TILES = "IMAGES/tiles/"
+
+Decors_Autumn=["mountain1","moutain2","mountain3","mushroomBrown","mushroomRed","plantRed_1","plantRed_2","plantRed_3","plantRed_4","plantRed_5","plantRed_6","rock","tree1","tree2","tree3","tree4","tree5","tree6"]
+Decors_Spring=["bush1","bush2","bush3","cactus","flowerB","flowerP","flowerR","grass1","grass2","grass3","mountain1","mountain2","mountain3","plant","plantGreen_1","plantGreen_2","plantGreen_3","plantTop_leaves","rock","tree1","tree2","tree3","tree4","tree5","tree6"]
+Decors_Summer=["plantGreen_4","plantGreen_5","plantGreen_6"]+Decors_Spring
+Decors_Winter=["mountain1","moutain2","mountain3","plantBlue_1","plantBlue_2","plantBlue_3","plantBlue_4","plantBlue_5","plantBlue_6","rock","snowhill","tree1","tree2","tree3","tree4","tree5","tree6","tree7"]
+
 
 
 ########################################################################################################################
@@ -105,7 +111,7 @@ class PLAYER(pygame.sprite.Sprite): #Tout ce qui concerne le joueur
 
 		#IMAGES
 		sprites = ["walk1","walk2","walk3","walk4","walk3","walk2","Dead","DeadFall"] #tous les sprites du joueur
-		self.player = "player_Blue" #On commence avec le personnage bleu
+		self.player = "player_Blue" #On commence avec le personn age bleu
 		self.players = ["player_Blue","player_Green","player_Grey","player_Red"]
 		for player in self.players: #Pour chacune des couleurs de personnage
 			LIST_name = player+"_Images" 
@@ -253,21 +259,20 @@ class PLAYER(pygame.sprite.Sprite): #Tout ce qui concerne le joueur
 
 		#on quitte le jeu, direction le menu
 		game.Menu()
-		
 
 ########################################################################################################################
 #Environnement##########################################################################################################
 ########################################################################################################################
 class ENVIRONNEMENT(pygame.sprite.Sprite):
-	def __init__(self,biome,modele,x,y,platform):
+	def __init__(self,biome,modele,x,platform):
 		pygame.sprite.Sprite.__init__(self)
 		#GLOBAL
 		self.platform = platform
 		self.x = x
-		self.y = y
+		self.y = 118
 
 		#IMAGES
-		self.image = pygame.image.load(ENV+biome+modele).convert_alpha()
+		self.image = pygame.image.load(ENV+biome+'/'+modele+'.png').convert_alpha()
 		self.rect = self.image.get_rect()
 		self.rect.y = self.platform.posY*51 - self.y
 
@@ -276,7 +281,6 @@ class ENVIRONNEMENT(pygame.sprite.Sprite):
 
 	def delete(self):
 		self.kill()
-
 
 ########################################################################################################################
 #Plateformes qui se deplacent###########################################################################################
@@ -297,14 +301,14 @@ class PLATFORM(pygame.sprite.Sprite):
 		self.enemy = None
 		self.coin = None
 		self.powerup = None
-		self.tree = None
+		self.element = None
 		self.grass = None
 		self.decors = None
+		
 		#COLLISIONS
 		self.rect = self.image.get_rect().inflate(10,0) #on grossit de 5px de chaque cote le rect pour ameliorer la detection des collisions
 		self.rect.x = self.posX
 		self.rect.y = self.posY
-
 
 	def update(self):
 		if self.posX < -64*self.size:
@@ -315,9 +319,13 @@ class PLATFORM(pygame.sprite.Sprite):
 				platformCount = 0
 				GeneratedSeason = seasons[random.randint(0,3)]
 			self.posX = width_screen
-			while game.lastPlatformY-self.posY > 4 or self.posY == game.lastPlatformY:
-				self.posY = random.randint(5,10)
+			#self.posX =game.lastPlatformX+game.lastPlatformSize*64
+			self.posY=game.lastPlatformY
+			while math.fabs(self.posY-game.lastPlatformY) > 4 or math.fabs(self.posY-game.lastPlatformY) <=1 :
+				self.posY = random.randint(4,10)
+			game.lastPlatformSize=self.size
 			game.lastPlatformY = self.posY
+			game.lastPlatformX = width_screen
 			self.size = random.randint(2,5)
 			self.season = GeneratedSeason
 			self.image = pygame.image.load(TILES+str(self.season)+"/"+str(self.size)+".png").convert_alpha()
@@ -331,15 +339,9 @@ class PLATFORM(pygame.sprite.Sprite):
 			if self.coin:
 					self.coin.delete()
 					self.coin = None
-			if self.tree:
-					self.tree.delete()
-					self.tree = None
-			if self.grass:
-					self.grass.delete()
-					self.grass = None
-			if self.decors:
-					self.decors.delete()
-					self.decors = None
+			if self.element:
+					self.element.delete()
+					self.element = None
 
 			if random.randint(0,proba_enemy)==1 and len(enemies)<=2: #nouvel ennemi si y'en a au max 3 sur l'ecran
 				enemy = ENEMY(["Flying","Walking","Floating"][random.randint(0,2)],random.randint(0,(self.size-1)*64),42,self)
@@ -354,14 +356,12 @@ class PLATFORM(pygame.sprite.Sprite):
 				powerups.add(powerup)
 				self.powerup = powerup
 			if random.randint(0,proba_tree)==1:
-				tree = ENVIRONNEMENT(["Spring Summer/","Autumn/","Winter/"][random.randint(0,2)],["tree1.png","tree2.png"] [random.randint(0,1)],random.randint(0,(self.size-1)*64),104,self)
-				decors.add(tree)
-				self.tree = tree
-			if random.randint(0,proba_grass)==1:
-				grass = ENVIRONNEMENT("Spring Summer/",["flowerB.png","flowerP.png","grass1.png","grass2.png","grass3.png"] [random.randint(0,4)],random.randint(0,(self.size-1)*64),57,self)
-				decors.add(grass)
-				self.grass = grass
-
+				self.modele = ('self.Decors_'+self.season)[random.randint(0,(len('self.Decors_'+self.season))-1)]
+				print(self.modele)
+				element = ENVIRONNEMENT(self.season,self.modele,random.randint(0,(self.size-1)*64),self)
+				decors.add(element)
+				self.element = element
+			
 		self.t+=0.01
 		if self.t>self.time: #si le temps est ecoule, on arrive à l'ecran
 			self.posX -= globalSpeed
@@ -404,7 +404,7 @@ class DISC(pygame.sprite.Sprite):
 	def __init__(self):
 		pygame.sprite.Sprite.__init__(self)
 		#GLOBAL
-		self.speed = 5*(width_screen/768)
+		self.speed = 5*width_screen
 		self.posX = player.posX + 10
 		self.posY = player.posY + 10
 
@@ -428,7 +428,6 @@ class DISC(pygame.sprite.Sprite):
 
 		if self.posX > width_screen: #on le supprime si il est sorti de l'ecran
 			self.kill()
-
 
 ########################################################################################################################
 #Types : Flying, Walking, Floating######################################################################################
@@ -579,7 +578,6 @@ class POWERUP(pygame.sprite.Sprite):
 	def delete(self):
 		self.kill()
 
-
 ########################################################################################################################
 #Objets : Pièces########################################################################################################
 ########################################################################################################################
@@ -648,7 +646,6 @@ class COIN(pygame.sprite.Sprite):
 	def delete(self):
 		self.kill()
 
-
 ########################################################################################################################
 #Animation : player prend powerup#######################################################################################
 ########################################################################################################################
@@ -667,7 +664,6 @@ class ANIMATIONS(pygame.sprite.Sprite): #animation qui trace un cercle blanc qui
 		if self.radius>width_screen: #si le cercle est assez grand, on retire l'animation du groupe
 			self.kill()
 
-
 ########################################################################################################################
 #le jeu, l'UI###########################################################################################################
 ########################################################################################################################
@@ -676,6 +672,8 @@ class GAME():
 		#GESTION GLOBALE
 		self.GAME = True
 		self.lastPlatformY = 0
+		self.lastPlatformSize = 5
+		self.lastPlatformX = width_screen
 
 		#IMAGES
 		#VIES
@@ -737,13 +735,12 @@ class GAME():
 		pygame.display.update() #maj de l'ecran
 
 
-	########################################################################################################################
-	#Ouverture Menu#########################################################################################################
-	########################################################################################################################
+	####################################################################################################################
+	#Ouverture Menu#####################################################################################################
+	####################################################################################################################
 	def Menu(self):
 		subprocess.Popen(("python","LauncherMenu.py")) #Programme annexe Menu
 		game.GAME=False  #--> on sort de la boucle de jeu
-
 
 ########################################################################################################################
 #Instanciation des objets###############################################################################################
@@ -762,7 +759,6 @@ for i in range(6): #instanciation des 6 plateformes
 	platform = PLATFORM(platformTime,platformSize,platformY,GeneratedSeason) #instanciation de la class (time,size,y,season)
 	platforms.add(platform) #ajout au groupe de sprites
 	platformCount+=1
-
 
 ########################################################################################################################
 #BOUCLE PRINCIPALE######################################################################################################
@@ -801,11 +797,10 @@ while game.GAME:
 					player.player = player.players[player.players.index(player.player)+1]
 
 		if event.type == QUIT or event.type==KEYDOWN and event.key == K_ESCAPE or game.GAME==False: #on quitte le jeu
-			score=str(int(player.distance/1366))
+			score=str(int(player.distance))
 			with open("Files/Score.txt","w") as file:
 				file.write(score)
 			game.Menu()
-
+	game.lastPlatformX-=globalSpeed
 	game.ScreenDisplay()
-
 pygame.quit()
