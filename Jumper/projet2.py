@@ -322,7 +322,7 @@ class PLATFORM(pygame.sprite.Sprite):
 				lenBiome = random.randint(5,10)
 				platformCount = 0
 				GeneratedSeason = seasons[random.randint(0,3)]
-			self.posX = width_screen
+			self.posX = game.lastPlatformX
 			self.posY=game.lastPlatformY
 			while game.lastPlatformY-self.posY > 2 or self.posY == game.lastPlatformY:
 				self.posY = random.randint(3,10)
