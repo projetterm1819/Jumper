@@ -268,12 +268,13 @@ class PLAYER(pygame.sprite.Sprite): #Tout ce qui concerne le joueur
 #Environnement##########################################################################################################
 ########################################################################################################################
 class ENVIRONNEMENT(pygame.sprite.Sprite):
-	def __init__(self,biome,x,platform):
+	def __init__(self,x,platform):
 		pygame.sprite.Sprite.__init__(self)
 		#IMAGES
 		self.modele = seasons_list[GeneratedSeason][random.randint(0,len(seasons_list[GeneratedSeason])-1)]
-		self.image = pygame.image.load(ENV+biome+'/'+self.modele).convert_alpha()
+		self.image = pygame.image.load(ENV+GeneratedSeason+'/'+self.modele).convert_alpha()
 		self.rect = self.image.get_rect()
+		print(GeneratedSeason+'/'+self.modele)
 
 		#GLOBAL
 		self.platform = platform
@@ -281,7 +282,7 @@ class ENVIRONNEMENT(pygame.sprite.Sprite):
 		self.rect.y = self.platform.posY*51 - self.y
 		self.x = x
 		if self.rect.right>self.platform.rect.right:
-			self.x+=self.rect.width-20
+			self.x+=self.rect.width + platform.size
 
 	def update(self):
 		self.rect.x = self.platform.posX + self.x
@@ -322,7 +323,7 @@ class PLATFORM(pygame.sprite.Sprite):
 				lenBiome = random.randint(5,10)
 				platformCount = 0
 				GeneratedSeason = seasons[random.randint(0,3)]
-			self.posX = game.lastPlatformX
+			self.posX = game.lastPlatformX+ width_screen
 			self.posY=game.lastPlatformY
 			while game.lastPlatformY-self.posY > 2 or self.posY == game.lastPlatformY:
 				self.posY = random.randint(3,10)
@@ -347,7 +348,7 @@ class PLATFORM(pygame.sprite.Sprite):
 					self.decors = None
 
 			if random.randint(0,proba_enemy)==1 and len(enemies)<=2: #nouvel ennemi si y'en a au max 3 sur l'ecran
-				enemy = ENEMY(["Flying","Walking","Floating"][random.randint(0,2)],random.randint(0,(self.size-1)*64),42,self)
+				enemy = ENEMY(["Flying","Walking","Floating"][random.randint(0,2)],random.randint(self.size,(self.size-1)*64),42,self)
 				enemies.add(enemy)
 				self.enemy = enemy
 			elif random.randint(0,proba_coin)==1 and len(coins)<=2:
@@ -359,7 +360,7 @@ class PLATFORM(pygame.sprite.Sprite):
 				powerups.add(powerup)
 				self.powerup = powerup
 			if random.randint(0,proba_env)==1:
-				decor = ENVIRONNEMENT(self.season,random.randint(0,(self.size-1)*64),self)
+				decor = ENVIRONNEMENT(random.randint(self.size,(self.size-1)*64),self)
 				decors.add(decor)
 				self.decors = decor
 			
@@ -677,7 +678,7 @@ class GAME():
 		self.GAME = True
 		self.lastPlatformY = 11
 		self.lastPlatformSize = 5
-		self.lastPlatformX = width_screen
+		self.lastPlatformX = 3456
 
 		#IMAGES
 		#VIES
@@ -744,6 +745,7 @@ class GAME():
 	#Ouverture Menu#####################################################################################################
 	####################################################################################################################
 	def Menu(self):
+		pass
 		subprocess.Popen(("python","LauncherMenu.py")) #Programme annexe Menu
 		game.GAME=False  #--> on sort de la boucle de jeu
 
@@ -757,7 +759,7 @@ for i in range(random.randint(10,20)): #instanciation des nuages pour le fond
 	cloud = CLOUD(random.randint(0,width_screen),random.randint(0,512),random.randint(8,15)) #(x,y,speed)
 	clouds.add(cloud) #ajout au groupe de sprites
 
-for i in range(6): #instanciation des 6 plateformes
+for i in range(9): #instanciation des 6 plateformes
 	platformSize = 5
 	platformX = i*64*(platformSize+1)
 	platformY = 11
