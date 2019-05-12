@@ -7,7 +7,7 @@ h=766
 
 #fonction lancer le jeu
 def launchGame():
-	sp.Popen(("python","projet2.py")) 
+	sp.Popen(("python","projet.py")) 
 	ScreenMenu.destroy()
 
 #fonction quitter
@@ -31,7 +31,7 @@ Background.create_image((w/2, h/2), image=image)
 
 ScreenMenu.bind('<Escape>', exit) #on associe echap à quitter
 
-Background.create_text(840,290,text="Meilleur Score : "+score, fill="#fff") #texte de score
+Background.create_text(840,290,text="Dernier Score : "+score, fill="#fff") #texte de score
 ButtonPicture= PhotoImage(file='titre.png') #bouton jouer
 Bouton = Button(image=ButtonPicture, command = launchGame,cursor="hand2")
 Bouton.place(bordermode=OUTSIDE, height=76, width=512,x=400,y=148)
