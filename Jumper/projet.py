@@ -24,7 +24,7 @@ BACKCOLOR = (196,233,242) #couleur de fond du jeu
 WHITE = (255,255,255)
 YELLOW = (255,218,74)
 
-#probabilités d'apparition de chaque objet :
+#probabilites d'apparition de chaque objet :
 proba_powerup = 20 #--> 1 chance sur 21
 proba_coin = 5
 proba_enemy = 5
@@ -38,7 +38,7 @@ ENV = "IMAGES/ENVIRONNEMENT/"
 TILES = "IMAGES/tiles/"
 
 
-#système de saisons
+#systeme de saisons
 Decors_Autumn=os.listdir(ENV+"Autumn") #on liste tous les fichiers dans le repertoire "IMAGES/ENVIRONNEMENT/Autumn"
 Decors_Spring=os.listdir(ENV+"Spring")
 Decors_Summer=os.listdir(ENV+"Summer")
@@ -87,7 +87,7 @@ class PLAYER(pygame.sprite.Sprite): #Tout ce qui concerne le joueur
 		self.lives = 5 #Nombre de vies
 		self.isdead = False
 		self.coins = 0
-		self.playerChangeTime = 0 #pour changer le perso du joueur au bout d'un certain teù^s
+		self.playerChangeTime = 0 #pour changer le perso du joueur au bout d'un certain tes
 
 		#SCORING
 		self.distance = 0
@@ -98,13 +98,13 @@ class PLAYER(pygame.sprite.Sprite): #Tout ce qui concerne le joueur
 		self.players = ["player_Blue","player_Green","player_Grey","player_Red"]
 		for player in self.players: #Pour chacune des couleurs de personnage
 			LIST_name = player+"_Images" 
-			setattr(self, LIST_name, []) #on va créer une liste des sprites du perso
-			for sprite in sprites: #pour chaque sprite, on va le chercher dans le répertoire, et on l'ajoute dans la liste
+			setattr(self, LIST_name, []) #on va creer une liste des sprites du perso
+			for sprite in sprites: #pour chaque sprite, on va le chercher dans le repertoire, et on l'ajoute dans la liste
 				img_rep = "IMAGES/"+player.lower()+"/player_"+str(sprite)+".png"
 				img_name = "image"+sprite+player
 				image = pygame.image.load(img_rep).convert_alpha()
-				setattr(self, img_name, image) #on associe l'image à la variable player.{img_name}
-				exec("self."+LIST_name+".append(self."+"image"+str(sprite)+player+")") #ajout à la liste
+				setattr(self, img_name, image) #on associe l'image a la variable player.{img_name}
+				exec("self."+LIST_name+".append(self."+"image"+str(sprite)+player+")") #ajout a la liste
 
 		self.persos = {"player_Blue":self.player_Blue_Images,"player_Green":self.player_Green_Images,"player_Grey":self.player_Grey_Images,"player_Red":self.player_Red_Images} #dictionnaire contenant les persos et leurs listes d'images
 
@@ -119,7 +119,7 @@ class PLAYER(pygame.sprite.Sprite): #Tout ce qui concerne le joueur
 		self.rect.y = self.posY
 
 		#FORCES ET MOUVEMENTS
-		self.isJumping = False #On définit les variables d'état du joueur
+		self.isJumping = False #On definit les variables d'etat du joueur
 		self.hasLanded = False
 		self.speed = 0.05
 		self.XForce = 0  #on definit des forces qui s'appliquent en x et y au joueur
@@ -202,7 +202,7 @@ class PLAYER(pygame.sprite.Sprite): #Tout ce qui concerne le joueur
 
 	def Fall(self):
 		self.posY-=self.YForce #chute
-		self.YForce -= self.g*self.playersMass[player.player] #incrémentation de la force de chute
+		self.YForce -= self.g*self.playersMass[player.player] #incrementation de la force de chute
 
 	def isDead(self): #le joueur est mort, on joue une animation
 		exec("self.image=self.imageDead"+str(self.player)) #on change l'image et update l'ecran
@@ -247,7 +247,7 @@ class PLAYER(pygame.sprite.Sprite): #Tout ce qui concerne le joueur
 ########################################################################################################################
 #Environnement##########################################################################################################
 ########################################################################################################################
-#decor instancié par plateforme : mouvement + suppression
+#decor instancie par plateforme : mouvement + suppression
 ########################################################################################################################
 class ENVIRONNEMENT(pygame.sprite.Sprite):
 	def __init__(self,x,platform):
@@ -295,7 +295,7 @@ class PLATFORM(pygame.sprite.Sprite):
 		#GLOBAL
 		self.posX = width_screen+x
 		self.posY = y
-		self.enemy = None #ennemis, pièces, bonus ou décors présents sur la plateforme
+		self.enemy = None #ennemis, pieces, bonus ou decors presents sur la plateforme
 		self.coin = None
 		self.powerup = None
 		self.decors = None
@@ -306,7 +306,7 @@ class PLATFORM(pygame.sprite.Sprite):
 		self.rect.y = self.posY*52
 
 	def update(self):
-		if self.posX < -64*self.size: #si la plateforme disparait à gauche de l'ecran, on la recharge
+		if self.posX < -64*self.size: #si la plateforme disparait a gauche de l'ecran, on la recharge
 			player.distance += 1
 			game.platformCount+=1
 			if game.platformCount == game.lenSeason: #changement de la saison
@@ -316,7 +316,7 @@ class PLATFORM(pygame.sprite.Sprite):
 
 			self.posX = game.lastPlatformX+ width_screen #nouvelles positions
 			self.posY=game.lastPlatformY
-			while game.lastPlatformY-self.posY > 2 or self.posY == game.lastPlatformY: #si trop grande différence de hauteur entre 2 plateformes
+			while game.lastPlatformY-self.posY > 2 or self.posY == game.lastPlatformY: #si trop grande difference de hauteur entre 2 plateformes
 				self.posY = random.randint(3,10)
 
 
@@ -344,7 +344,7 @@ class PLATFORM(pygame.sprite.Sprite):
 					self.decors.delete()
 					self.decors = None
 
-			#on rajoute de nouveaux attributs suivant des probabilités
+			#on rajoute de nouveaux attributs suivant des probabilites
 			if random.randint(0,proba_enemy)==1 and len(enemies)<=2: #nouvel ennemi si y'en a au max 3 sur l'ecran
 				enemy = ENEMY(["Flying","Walking","Floating"][random.randint(0,2)],random.randint(self.size,(self.size-1)*64),self)
 				enemies.add(enemy)
@@ -383,7 +383,7 @@ class CLOUD(pygame.sprite.Sprite):
 		self.posY = y
 
 		#IMAGES AND COLLISIONS
-		self.image = pygame.image.load("IMAGES/CLOUDS/cloud"+str(random.randint(1,8))+".png").convert_alpha() #on charge une image aléatoire
+		self.image = pygame.image.load("IMAGES/CLOUDS/cloud"+str(random.randint(1,8))+".png").convert_alpha() #on charge une image aleatoire
 		self.rect = self.image.get_rect()
 		self.rect.x = self.posX
 		self.rect.y = self.posY
@@ -404,7 +404,7 @@ class CLOUD(pygame.sprite.Sprite):
 ########################################################################################################################
 #Disque d'attaque de Grey###############################################################################################
 ########################################################################################################################
-#disque lancé par grey contre un ennemi : deplacement + detection collision ennemi + suppression
+#disque lance par grey contre un ennemi : deplacement + detection collision ennemi + suppression
 ########################################################################################################################
 class DISC(pygame.sprite.Sprite):
 	def __init__(self):
@@ -436,7 +436,7 @@ class DISC(pygame.sprite.Sprite):
 ########################################################################################################################
 #Types : Flying, Walking, Floating######################################################################################
 ########################################################################################################################
-#ennemi se déplacant en marchant, flottant ou volant : animation et deplacement + mort + animation de projection au contact de red 
+#ennemi se deplacant en marchant, flottant ou volant : animation et deplacement + mort + animation de projection au contact de red 
 ########################################################################################################################
 class ENEMY(pygame.sprite.Sprite):
 	def __init__(self,EnemyType,x,platform):
@@ -447,8 +447,8 @@ class ENEMY(pygame.sprite.Sprite):
 		self.direction = 1 #1:droite,-1:gauche
 
 		#GLOBAL
-		self.platform = platform #plateforme à laquelle il est lie
-		self.yMove = 0 #le deplacement en x et y de l'ennemi par rapport à sa plateforme attachee
+		self.platform = platform #plateforme a laquelle il est lie
+		self.yMove = 0 #le deplacement en x et y de l'ennemi par rapport a sa plateforme attachee
 		self.xMove = 0
 		self.isAlive = True
 
@@ -458,7 +458,7 @@ class ENEMY(pygame.sprite.Sprite):
 
 		sprites = ["1","2","3","dead"] #differents sprites de l'ennemi
 
-		for Type in types: #on charge tous ses sprites en parcourant les listes et on les associe à l'instance de classe
+		for Type in types: #on charge tous ses sprites en parcourant les listes et on les associe a l'instance de classe
 
 			for sprite_name in sprites:
 				image="IMAGES/enemy_"+Type+"/"+sprite_name+".png"
@@ -468,7 +468,7 @@ class ENEMY(pygame.sprite.Sprite):
 		self.imgsWalking = [self.img1Walking,self.img2Walking,self.img3Walking,self.img2Walking]
 		self.imgsFloating = [self.img1Floating,self.img2Floating,self.img3Floating,self.img2Floating]
 
-		self.enemies = {"Flying":self.imgsFlying,"Walking":self.imgsWalking,"Floating":self.imgsFloating} #on associe le type de l'ennemi à une animation
+		self.enemies = {"Flying":self.imgsFlying,"Walking":self.imgsWalking,"Floating":self.imgsFloating} #on associe le type de l'ennemi a une animation
 
 		self.imgNumber = 0
 		self.image = self.enemies[self.type][self.imgNumber]
@@ -488,7 +488,7 @@ class ENEMY(pygame.sprite.Sprite):
 		if self.isAlive: #si l'ennemi est vivant, on l'anime et le deplace
 			self.image = self.enemies[self.type][int(self.imgNumber)]
 			self.rect = self.image.get_rect()
-			self.rect.x = self.platform.posX + self.x + self.xMove #positions liees à sa plateforme, au decalage initial par rapport à elle, et au mouvement de l'ennemi
+			self.rect.x = self.platform.posX + self.x + self.xMove #positions liees a sa plateforme, au decalage initial par rapport a elle, et au mouvement de l'ennemi
 			self.rect.y = self.platform.posY*52-self.rect.height + self.yMove
 			self.imgNumber+=self.imgPersistance[self.type]
 			self.imgNumber%=4
@@ -502,7 +502,7 @@ class ENEMY(pygame.sprite.Sprite):
 
 			if player.player=="player_Red" and self.rect.colliderect(player.bubbleRect): #collision avec red
 				self.isAlive = False
-				coin = COIN(self.x,self.platform.rect.y-self.rect.y,self.platform) #on crée une pièce
+				coin = COIN(self.x,self.platform.rect.y-self.rect.y,self.platform) #on cree une piece
 				coins.add(coin)
 				angle = random.randint(0,75)
 				self.XForce = math.fabs(math.degrees(math.cos(angle)))/10
@@ -575,8 +575,8 @@ class POWERUP(pygame.sprite.Sprite):
 		self.rect.y = self.platform.posY*51 - self.y
 
 		if self.rect.colliderect(player.rect): #si le joueur prend le bonus
-			player.playerChangeTime = 0 #on remet le temps de bonus à 0
-			anim = ANIMATIONS(player.rect.x,player.rect.y) #on créé l'animation de cercle
+			player.playerChangeTime = 0 #on remet le temps de bonus a 0
+			anim = ANIMATIONS(player.rect.x,player.rect.y) #on cree l'animation de cercle
 			animations.add(anim)
 			NewPlayer = player.player
 			while NewPlayer==player.player: # on change le joueur
@@ -589,9 +589,9 @@ class POWERUP(pygame.sprite.Sprite):
 		self.kill()
 
 ########################################################################################################################
-#Objets : Pièces########################################################################################################
+#Objets : Pieces########################################################################################################
 ########################################################################################################################
-#deplacement + animation rotation + collision joueur + deplacement vers tas de pièces + suppression
+#deplacement + animation rotation + collision joueur + deplacement vers tas de pieces + suppression
 ########################################################################################################################
 class COIN(pygame.sprite.Sprite):
 	def __init__(self,x,y,platform):
@@ -625,15 +625,15 @@ class COIN(pygame.sprite.Sprite):
 		if not self.took: #si elle n'est pas encore prise : on anime et deplace
 			self.rect = self.image.get_rect()
 
-			self.rect.x = self.platform.posX + self.x #on suit la plateforme liee, et en induisant le decalage de la pos de la pièce
-			self.rect.y = self.platform.posY*51 - self.y #de même
+			self.rect.x = self.platform.posX + self.x #on suit la plateforme liee, et en induisant le decalage de la pos de la piece
+			self.rect.y = self.platform.posY*51 - self.y #de meme
 
-			if self.rect.colliderect(player.rect): #si le joueur prend la pièce
+			if self.rect.colliderect(player.rect): #si le joueur prend la piece
 				self.platform.coin = None
 				self.Xmove = 1280-self.rect.x
 				self.Ymove = self.rect.y-10
 				self.took = True
-		else: #on déplace la piece jusqu'au tas
+		else: #on deplace la piece jusqu'au tas
 			self.go()
 
 	def go(self): #deplacement vers le tas en utilisant un coefficient directeur
@@ -667,7 +667,7 @@ class ANIMATIONS(pygame.sprite.Sprite): #animation qui trace un cercle blanc qui
 		self.y = y
 		self.radius = 106
 		self.growSpeed = 30
-		self.color = (random.randint(0,255),random.randint(0,255),random.randint(0,255)) #couleur aléatoire
+		self.color = (random.randint(0,255),random.randint(0,255),random.randint(0,255)) #couleur aleatoire
 
 	def update(self):
 		self.radius+=self.growSpeed #on augmente le rayon
@@ -678,17 +678,17 @@ class ANIMATIONS(pygame.sprite.Sprite): #animation qui trace un cercle blanc qui
 ########################################################################################################################
 #le jeu, l'UI###########################################################################################################
 ########################################################################################################################
-#classe gerant les variables du jeu et l'affichage des pièces et vies
+#classe gerant les variables du jeu et l'affichage des pieces et vies
 ########################################################################################################################
 class GAME():
 	def __init__(self):
 		#GESTION GLOBALE
 		self.GAME = True #variable de boucle de jeu
-		self.lastPlatformY = 11  #3 variables sur la derniere plateforme (utilisé pour limiter la difference de hauteur entre 2 plateformes)
+		self.lastPlatformY = 11  #3 variables sur la derniere plateforme (utilise pour limiter la difference de hauteur entre 2 plateformes)
 		self.lastPlatformSize = 5
 		self.lastPlatformX = 3456
 		self.platformCount = 0
-		self.lenSeason = random.randint(5,10) #durée de la saison
+		self.lenSeason = random.randint(5,10) #duree de la saison
 		self.GeneratedSeason = seasons[random.randint(0,3)] 
 
 		#IMAGES
@@ -700,7 +700,7 @@ class GAME():
 		for i in range(10):
 			self.numbers.append(pygame.image.load(NUMBERS+str(i)+".png").convert_alpha()) #on charge les images des nombres
 		spritesCoin = ["coin"+str(i+1) for i in range(6)]
-		for sprite in spritesCoin: #on charge les images des pièces
+		for sprite in spritesCoin: #on charge les images des pieces
 			setattr(self,sprite,pygame.image.load(OBJECTS+sprite+".png").convert_alpha())
 
 		#COIN ANIMATION
@@ -716,7 +716,7 @@ class GAME():
 		for live in range(player.lives):
 			screen.blit(self.heartFull,((live+1)*x,10)) #afficher le nombre de coeurs correspondant
 
-		if player.coins==10: #+1vie au bout de 10 pièces
+		if player.coins==10: #+1vie au bout de 10 pieces
 			player.coins = 0
 			player.lives+=1
 
@@ -724,15 +724,15 @@ class GAME():
 		self.animNumber%=6
 		self.imgCoin = self.animationCoin[int(self.animNumber)]
 		screen.blit(self.imgCoin,(1300,10))
-		screen.blit(self.numbers[int(player.coins)],(1267,15)) #afficher le nombre de pièces et l'image pièce
+		screen.blit(self.numbers[int(player.coins)],(1267,15)) #afficher le nombre de pieces et l'image piece
 
 	########################################################################################################################
-	#Mise à jour de l'ecran#################################################################################################
+	#Mise a jour de l'ecran#################################################################################################
 	########################################################################################################################
 	def ScreenDisplay(self): #on update l'ecran
 		#Group.clear(screen, background) efface la zone du sprite en remplacant avec background, sur le screen
 		#Group.update() appelle la fonction update de tous les membres du groupe
-		#Group.draw(screen) dessine chaque sprite à l'ecran avec son rect et son image sur le screen
+		#Group.draw(screen) dessine chaque sprite a l'ecran avec son rect et son image sur le screen
 		player.move()
 		player.XForce += (player.XForce<0)*player.speed*1/3 - (player.XForce>0)*player.speed*1/3
 
@@ -791,7 +791,7 @@ for i in range(9): #instanciation des 6 plateformes
 while game.GAME:
 	fpsClock.tick(FPS) #on regule la vitesse de jeu, pour pas que la boucle tourne trop vite
 
-	for event in pygame.event.get(): #pile des evènements
+	for event in pygame.event.get(): #pile des evenements
 		if event.type == KEYDOWN:
 			###DEPLACEMENTS HORIZONTAUX
 			if event.key == K_LEFT:
@@ -812,7 +812,7 @@ while game.GAME:
 				player.YForce = -1 #YForce<0 donc phase de chute, on donne -1 pour qu'il ait deja une vitesse de chute
 			
 			###LANCER UN DISQUE AVEC GREY
-			if event.key == K_SPACE and player.player=="player_Grey" and len(discs)<1: #une attaque de grey à la fois
+			if event.key == K_SPACE and player.player=="player_Grey" and len(discs)<1: #une attaque de grey a la fois
 				disc = DISC()
 				discs.add(disc)
 
