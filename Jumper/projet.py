@@ -1,4 +1,4 @@
-																													"""
+"""
 JEU JUMPER :
 Par Etienne Clairis
 	Lois Castets																									"""
@@ -94,7 +94,7 @@ class PLAYER(pygame.sprite.Sprite): #Tout ce qui concerne le joueur
 
 		#IMAGES
 		sprites = ["walk1","walk2","walk3","walk4","walk3","walk2","Dead","DeadFall"] #tous les sprites du joueur
-		self.player = "player_Blue" #On commence avec le personn age bleu
+		self.player = "player_Blue" #On commence avec le personnage bleu
 		self.players = ["player_Blue","player_Green","player_Grey","player_Red"]
 		for player in self.players: #Pour chacune des couleurs de personnage
 			LIST_name = player+"_Images" 
@@ -756,7 +756,9 @@ class GAME():
 	#Ouverture Menu#####################################################################################################
 	####################################################################################################################
 	def Menu(self):
-		pass
+		score=str(int(player.distance)) 
+		with open("Files/Score.txt","w") as file: #on ecrit le score dans un fichier
+			file.write(score)
 		subprocess.Popen(("python","LauncherMenu.py")) #Programme annexe Menu
 		game.GAME=False  #--> on sort de la boucle de jeu
 
@@ -776,7 +778,7 @@ for i in range(random.randint(10,20)): #instanciation des nuages pour le fond
 for i in range(9): #instanciation des 6 plateformes
 	platformSize = 5
 	platformX = i*64*(platformSize+1)
-	platformY = 10
+	platformY = random.randint(7,10)
 	platform = PLATFORM(platformX,platformSize,platformY,game.GeneratedSeason) #instanciation de la class (time,size,y,season)
 	platforms.add(platform) #ajout au groupe de sprites
 	game.platformCount+=1
@@ -787,7 +789,7 @@ for i in range(9): #instanciation des 6 plateformes
 ¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨"""
 
 while game.GAME:
-	fpsClock.tick(FPS) #on regule la vitesse de jeu
+	fpsClock.tick(FPS) #on regule la vitesse de jeu, pour pas que la boucle tourne trop vite
 
 	for event in pygame.event.get(): #pile des evènements
 		if event.type == KEYDOWN:
@@ -816,9 +818,6 @@ while game.GAME:
 
 		####QUITTER
 		if event.type == QUIT or event.type==KEYDOWN and event.key == K_ESCAPE or game.GAME==False: #on quitte le jeu
-			score=str(int(player.distance)) 
-			with open("Files/Score.txt","w") as file: #on ecrit le score dans un fichier
-				file.write(score)
 			game.Menu()
 
 	game.lastPlatformX-=globalSpeed
