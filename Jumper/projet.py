@@ -57,6 +57,7 @@ water = pygame.image.load("IMAGES/water.png").convert_alpha() #image de fond de 
 #https://www.pygame.org/docs/ref/sprite.html#pygame.sprite.RenderUpdates
 discs = pygame.sprite.RenderUpdates()
 clouds = pygame.sprite.RenderUpdates()
+stars = pygame.sprite.RenderUpdates()
 platforms = pygame.sprite.RenderUpdates()
 enemies = pygame.sprite.RenderUpdates()
 coins = pygame.sprite.RenderUpdates()
@@ -64,7 +65,6 @@ powerups = pygame.sprite.RenderUpdates()
 decors = pygame.sprite.RenderUpdates() #environnement
 animations = pygame.sprite.RenderUpdates() 
 playerGroup = pygame.sprite.RenderUpdates() #juste le joueur
-
 
 """_____________________________________________________________________________________________________________________
 #DECLARATION DES CLASSES################################################################################################
@@ -400,6 +400,18 @@ class CLOUD(pygame.sprite.Sprite):
 		self.rect.x = self.posX #deplacement
 		self.rect.y = self.posY
 
+class STAR(pygame.sprite.Sprite):
+	def __init__(self):
+		pygame.sprite.Sprite.__init__(self)
+		stars.add(self)
+		self.image = pygame.image.load(ENV+"star.png").convert_alpha()
+		self.rect = self.image.get_rect()
+		self.rect.x=random.randint(0,1366)
+		self.rect.y=random.randint(0,768)
+
+	def delete():
+		self.kill()
+
 ########################################################################################################################
 #Disque d'attaque de Grey###############################################################################################
 ########################################################################################################################
@@ -689,6 +701,7 @@ class GAME():
 		self.platformCount = 0
 		self.lenSeason = random.randint(5,10) #duree de la saison
 		self.GeneratedSeason = seasons[random.randint(0,3)] 
+		self.mode = "night"
 
 		#IMAGES
 		#VIES
@@ -725,6 +738,10 @@ class GAME():
 		screen.blit(self.imgCoin,(1300,10))
 		screen.blit(self.numbers[int(player.coins)],(1267,15)) #afficher le nombre de pieces et l'image piece
 
+	def nightMode(self):
+		for i in range(random.randint(10,20)):
+			star = STAR()
+
 	########################################################################################################################
 	#Mise a jour de l'ecran#################################################################################################
 	########################################################################################################################
@@ -732,6 +749,8 @@ class GAME():
 		#Group.clear(screen, background) efface la zone du sprite en remplacant avec background, sur le screen
 		#Group.update() appelle la fonction update de tous les membres du groupe
 		#Group.draw(screen) dessine chaque sprite a l'ecran avec son rect et son image sur le screen
+		if self.mode =="night" and len(stars)==0:
+			self.nightMode()
 		player.move()
 		player.XForce += (player.XForce<0)*player.speed*1/3 - (player.XForce>0)*player.speed*1/3
 
@@ -741,6 +760,7 @@ class GAME():
 		self.UI() #on update l'UI
 		clouds.update()
 		clouds.draw(screen)
+		stars.draw(screen)
 		animations.update()
 		decors.update()
 		decors.draw(screen)
