@@ -1,10 +1,11 @@
 """
 JEU JUMPER :
 Par Etienne Clairis
-	Lois Castets																									
-________________________________________________________________________________________________________________________
+	Lois Castets																									"""
+
+"""_____________________________________________________________________________________________________________________
 #IMPORTATIONS###########################################################################################################
-#####################################################################################################################"""
+¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨"""
 
 import pygame, os, time, random, math, subprocess
 from pygame.locals import* 
@@ -24,7 +25,7 @@ WHITE = (255,255,255)
 YELLOW = (255,218,74)
 
 #probabilites d'apparition de chaque objet :
-proba_powerup = 20 #--> 1 chance sur 21
+proba_powerup = 18 #--> 1 chance sur 21
 proba_coin = 5
 proba_enemy = 5
 proba_env = 1
@@ -57,7 +58,6 @@ water = pygame.image.load("IMAGES/water.png").convert_alpha() #image de fond de 
 #https://www.pygame.org/docs/ref/sprite.html#pygame.sprite.RenderUpdates
 discs = pygame.sprite.RenderUpdates()
 clouds = pygame.sprite.RenderUpdates()
-stars = pygame.sprite.RenderUpdates()
 platforms = pygame.sprite.RenderUpdates()
 enemies = pygame.sprite.RenderUpdates()
 coins = pygame.sprite.RenderUpdates()
@@ -65,10 +65,11 @@ powerups = pygame.sprite.RenderUpdates()
 decors = pygame.sprite.RenderUpdates() #environnement
 animations = pygame.sprite.RenderUpdates() 
 playerGroup = pygame.sprite.RenderUpdates() #juste le joueur
+stars = pygame.sprite.RenderUpdates()
 
 """_____________________________________________________________________________________________________________________
 #DECLARATION DES CLASSES################################################################################################
-#####################################################################################################################"""
+¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨"""
 
 
 ########################################################################################################################
@@ -83,7 +84,7 @@ class PLAYER(pygame.sprite.Sprite): #Tout ce qui concerne le joueur
 		#GLOBAL
 		self.posX = 470  #Position en X (Par rapport au Left)
 		self.posY = -700 #Position en Y (par rapport au Top) .. 700 pixels + hauts, pour tomber sur une plateforme
-		self.lives = 5 #Nombre de vies
+		self.lives = 50 #Nombre de vies
 		self.isdead = False
 		self.coins = 0
 		self.playerChangeTime = 0 #pour changer le perso du joueur au bout d'un certain tes
@@ -306,7 +307,7 @@ class PLATFORM(pygame.sprite.Sprite):
 
 	def update(self):
 		if self.posX < -64*self.size: #si la plateforme disparait a gauche de l'ecran, on la recharge
-			player.distance += 1 #quand la plateforme disparait, on incrémente la distance.
+			player.distance += 1
 			game.platformCount+=1
 			if game.platformCount == game.lenSeason: #changement de la saison
 				game.lenSeason = random.randint(5,10)
@@ -344,19 +345,19 @@ class PLATFORM(pygame.sprite.Sprite):
 					self.decors = None
 
 			#on rajoute de nouveaux attributs suivant des probabilites
-			if random.randint(0,proba_enemy)==1 and len(enemies)<=2: #nouvel ennemi si y'en a au max 3 sur l'ecran
+			if random.randint(0,proba_enemy) and len(enemies)<=2: #nouvel ennemi si y'en a au max 3 sur l'ecran
 				enemy = ENEMY(["Flying","Walking","Floating"][random.randint(0,2)],random.randint(self.size,(self.size-1)*64),self)
 				enemies.add(enemy)
 				self.enemy = enemy
-			elif random.randint(0,proba_coin)==1 and len(coins)<=2:
+			elif random.randint(0,proba_coin) and len(coins)<=2:
 				coin = COIN(50,50,self)
 				coins.add(coin)
 				self.coin = coin
-			elif random.randint(0,proba_powerup)==1 and len(powerups)==0:
+			elif random.randint(0,proba_powerup) and len(powerups)==0:
 				powerup = POWERUP(50,50,self)
 				powerups.add(powerup)
 				self.powerup = powerup
-			if random.randint(0,proba_env)==1:
+			if random.randint(0,proba_env):
 				decor = ENVIRONNEMENT(random.randint(0,(self.size-1)*64),self)
 				decors.add(decor)
 				self.decors = decor
@@ -399,18 +400,6 @@ class CLOUD(pygame.sprite.Sprite):
 
 		self.rect.x = self.posX #deplacement
 		self.rect.y = self.posY
-
-class STAR(pygame.sprite.Sprite):
-	def __init__(self):
-		pygame.sprite.Sprite.__init__(self)
-		stars.add(self)
-		self.image = pygame.image.load(ENV+"star.png").convert_alpha()
-		self.rect = self.image.get_rect()
-		self.rect.x=random.randint(0,1366)
-		self.rect.y=random.randint(0,768)
-
-	def delete():
-		self.kill()
 
 ########################################################################################################################
 #Disque d'attaque de Grey###############################################################################################
@@ -686,6 +675,19 @@ class ANIMATIONS(pygame.sprite.Sprite): #animation qui trace un cercle blanc qui
 		if self.radius>width_screen: #si le cercle est assez grand, on retire l'animation du groupe
 			self.kill()
 
+class STAR(pygame.sprite.Sprite):
+	def __init__(self):
+		pygame.sprite.Sprite.__init__(self)
+		stars.add(self)
+		game.stars_list.append(self)
+		self.image = pygame.image.load(ENV+"star.png").convert_alpha()
+		self.rect = self.image.get_rect()
+		self.rect.x=random.randint(0,1366)
+		self.rect.y=random.randint(0,200)
+
+	def delete():
+		self.kill()
+
 ########################################################################################################################
 #le jeu, l'UI###########################################################################################################
 ########################################################################################################################
@@ -693,17 +695,38 @@ class ANIMATIONS(pygame.sprite.Sprite): #animation qui trace un cercle blanc qui
 ########################################################################################################################
 class GAME():
 	def __init__(self):
-		#GESTION PLATEFORME + DECORS
+		#GESTION GLOBALE
 		self.GAME = True #variable de boucle de jeu
 		self.lastPlatformY = 11  #3 variables sur la derniere plateforme (utilise pour limiter la difference de hauteur entre 2 plateformes)
 		self.lastPlatformSize = 5
-		self.lastPlatformX = 3456 #nombre de pixels utilisé par les plateforme d'initialisation
+		self.lastPlatformX = 3456
 		self.platformCount = 0
 		self.lenSeason = random.randint(5,10) #duree de la saison
 		self.GeneratedSeason = seasons[random.randint(0,3)] 
-		self.mode = "night"
+		self.blue = 242
+		self.red = 196
+		self.green = 233
+		self.dir_color = -1
+		self.time_color = 0
+		self.max_time_color = 4000
+		self.night = (64,17,142)
+		self.day = (196,233,242)
+		self.night_mode = "day"
+		self.stars_list = []
 
 		#IMAGES
+		self.moon_img = pygame.image.load("IMAGES/moon.png").convert_alpha()
+		self.moon_rect = self.moon_img.get_rect()
+		self.moon_rect.x = 0
+		self.moon_rect.y = height_screen/2
+		self.moon_angle = 0
+
+		self.sun_img = pygame.image.load("IMAGES/sun.png").convert_alpha()
+		self.sun_rect = self.moon_img.get_rect()
+		self.sun_rect.x = width_screen
+		self.sun_rect.y = height_screen/2
+		self.sun_angle = math.pi
+
 		#VIES
 		self.heartFull = pygame.image.load(UI+"heartFull.png").convert_alpha() #chargement des images pour l'UI
 		self.numbers = []
@@ -742,6 +765,16 @@ class GAME():
 		for i in range(random.randint(10,20)):
 			star = STAR()
 
+	def moon_sun(self):
+		self.sun_rect.x = math.cos(self.sun_angle)*800+width_screen/2
+		self.sun_rect.y = math.sin(self.sun_angle)*800+height_screen
+		self.moon_rect.x = math.cos(self.moon_angle)*800+width_screen/2
+		self.moon_rect.y = math.sin(self.moon_angle)*800+height_screen
+		self.sun_angle%=2*math.pi
+		self.moon_angle%=2*math.pi
+		screen.blit(self.sun_img,self.sun_rect)
+		screen.blit(self.moon_img,self.moon_rect)
+
 	########################################################################################################################
 	#Mise a jour de l'ecran#################################################################################################
 	########################################################################################################################
@@ -749,18 +782,72 @@ class GAME():
 		#Group.clear(screen, background) efface la zone du sprite en remplacant avec background, sur le screen
 		#Group.update() appelle la fonction update de tous les membres du groupe
 		#Group.draw(screen) dessine chaque sprite a l'ecran avec son rect et son image sur le screen
-		if self.mode =="night" and len(stars)==0:
-			self.nightMode()
 		player.move()
 		player.XForce += (player.XForce<0)*player.speed*1/3 - (player.XForce>0)*player.speed*1/3
 
 		ALLTYPES = {platforms,enemies,coins,discs,playerGroup,powerups}
+
+
+
+		if self.night_mode=="day":
+			self.sun_angle+=math.pi/6000
+			self.time_color+=1
+			if self.time_color>self.max_time_color:
+				self.moon_angle=math.pi
+				self.night_mode="day>night"
+				self.time_color=0
+				self.max_time_color = 4000
+
+		if self.night_mode=="day>night":
+			self.sun_angle+=math.pi/10000
+			self.time_color+=1
+			self.blue-=1/142
+			self.green-=1/32
+			self.red-=1/64
+			if random.randint(0,200)==0:
+				star = STAR()
+			if self.time_color>self.max_time_color:
+				self.night_mode="night"
+				self.time_color=0
+				self.max_time_color = 4000
+
+		if self.night_mode=="night":
+			self.moon_angle+=math.pi/6000
+			self.time_color+=1
+			if self.time_color>self.max_time_color:
+				self.night_mode="night>day"
+				self.sun_angle=math.pi
+				self.time_color=0
+				self.max_time_color = 4000
+
+
+		if self.night_mode=="night>day":
+			try:
+				if random.randint(0,100)==0:
+					self.stars_list[len(self.stars_list)-1].kill()
+					self.stars_list.remove(self.stars_list[len(self.stars_list)-1])
+			except:
+				pass
+			self.moon_angle+=math.pi/10000
+			self.time_color+=1
+			self.blue+=1/142
+			self.green+=1/32
+			self.red+=1/64
+			if self.time_color>self.max_time_color:
+				self.night_mode="day"
+				self.time_color=0
+				self.max_time_color = 4000
+
+
+		BACKCOLOR=(self.red,self.green,self.blue)
 		screen.fill(BACKCOLOR)
-		
-		self.UI() #on update l'UI
+
+		self.moon_sun()
+		stars.update()
+		stars.draw(screen)
 		clouds.update()
 		clouds.draw(screen)
-		stars.draw(screen)
+		self.UI() #on update l'UI
 		animations.update()
 		decors.update()
 		decors.draw(screen)
@@ -784,7 +871,7 @@ class GAME():
 
 """_____________________________________________________________________________________________________________________
 #Instanciation des objets###############################################################################################
-#####################################################################################################################"""
+¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨"""
 
 
 player = PLAYER()
@@ -805,7 +892,7 @@ for i in range(9): #instanciation des 6 plateformes
 
 """_____________________________________________________________________________________________________________________
 #BOUCLE PRINCIPALE######################################################################################################
-#####################################################################################################################"""
+¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨"""
 
 while game.GAME:
 	fpsClock.tick(FPS) #on regule la vitesse de jeu, pour pas que la boucle tourne trop vite
