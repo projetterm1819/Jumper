@@ -306,7 +306,7 @@ class PLATFORM(pygame.sprite.Sprite):
 
 	def update(self):
 		if self.posX < -64*self.size: #si la plateforme disparait a gauche de l'ecran, on la recharge
-			player.distance += 1
+			player.distance += 1 #quand la plateforme disparait, on incrémente la distance.
 			game.platformCount+=1
 			if game.platformCount == game.lenSeason: #changement de la saison
 				game.lenSeason = random.randint(5,10)
@@ -681,11 +681,11 @@ class ANIMATIONS(pygame.sprite.Sprite): #animation qui trace un cercle blanc qui
 ########################################################################################################################
 class GAME():
 	def __init__(self):
-		#GESTION GLOBALE
+		#GESTION PLATEFORME + DECORS
 		self.GAME = True #variable de boucle de jeu
 		self.lastPlatformY = 11  #3 variables sur la derniere plateforme (utilise pour limiter la difference de hauteur entre 2 plateformes)
 		self.lastPlatformSize = 5
-		self.lastPlatformX = 3456
+		self.lastPlatformX = 3456 #nombre de pixels utilisé par les plateforme d'initialisation
 		self.platformCount = 0
 		self.lenSeason = random.randint(5,10) #duree de la saison
 		self.GeneratedSeason = seasons[random.randint(0,3)] 
