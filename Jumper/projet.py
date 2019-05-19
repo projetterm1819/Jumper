@@ -84,7 +84,7 @@ class PLAYER(pygame.sprite.Sprite): #Tout ce qui concerne le joueur
 		#GLOBAL
 		self.posX = 470  #Position en X (Par rapport au Left)
 		self.posY = -700 #Position en Y (par rapport au Top) .. 700 pixels + hauts, pour tomber sur une plateforme
-		self.lives = 50 #Nombre de vies
+		self.lives = 5 #Nombre de vies
 		self.isdead = False
 		self.coins = 0
 		self.playerChangeTime = 0 #pour changer le perso du joueur au bout d'un certain tes
@@ -207,6 +207,7 @@ class PLAYER(pygame.sprite.Sprite): #Tout ce qui concerne le joueur
 	def isDead(self): #le joueur est mort, on joue une animation
 		exec("self.image=self.imageDead"+str(self.player)) #on change l'image et update l'ecran
 		ALLTYPES = {platforms,enemies,coins,discs,powerups,decors}
+		BACKCOLOR=(game.red,game.green,game.blue)
 		screen.fill(BACKCOLOR)
 		game.UI() 
 		clouds.update()
@@ -225,6 +226,7 @@ class PLAYER(pygame.sprite.Sprite): #Tout ce qui concerne le joueur
 
 		while self.posY<height_screen: #on fait chuter le joueur, tout en updatant l'ecran
 			ALLTYPES = {platforms,enemies,coins,discs,powerups,decors}
+			BACKCOLOR=(game.red,game.green,game.blue)
 			screen.fill(BACKCOLOR)
 			game.UI() 
 			clouds.update()
@@ -445,6 +447,7 @@ class ENEMY(pygame.sprite.Sprite):
 		self.x = x
 		self.speed = 0.25
 		self.direction = 1 #1:droite,-1:gauche
+		self.dir_changed = False
 
 		#GLOBAL
 		self.platform = platform #plateforme a laquelle il est lie
@@ -461,7 +464,10 @@ class ENEMY(pygame.sprite.Sprite):
 		for Type in types: #on charge tous ses sprites en parcourant les listes et on les associe a l'instance de classe
 
 			for sprite_name in sprites:
-				image="IMAGES/enemy_"+Type+"/"+sprite_name+".png"
+				if game.ISNIGHT:
+					image="IMAGES/enemy_"+Type+"_night"+"/"+sprite_name+".png"
+				else:
+					image="IMAGES/enemy_"+Type+"/"+sprite_name+".png"					
 				setattr(self, str("img"+sprite_name+Type),pygame.image.load(image).convert_alpha())
 
 		self.imgsFlying = [self.img1Flying,self.img2Flying,self.img3Flying,self.img2Flying] #on definit une animation pour chaque ennemi
@@ -487,6 +493,8 @@ class ENEMY(pygame.sprite.Sprite):
 	def update(self):
 		if self.isAlive: #si l'ennemi est vivant, on l'anime et le deplace
 			self.image = self.enemies[self.type][int(self.imgNumber)]
+			if self.dir_changed:
+				self.image = pygame.transform.flip(self.image,1,0)
 			self.rect = self.image.get_rect()
 			self.rect.x = self.platform.posX + self.x + self.xMove #positions liees a sa plateforme, au decalage initial par rapport a elle, et au mouvement de l'ennemi
 			self.rect.y = self.platform.posY*52-self.rect.height + self.yMove
@@ -542,8 +550,10 @@ class ENEMY(pygame.sprite.Sprite):
 		#changement de direction au bout de la plateforme:
 		if self.rect.right>self.platform.rect.right:
 			self.direction = 1
+			self.dir_changed = not self.dir_changed
 		if self.rect.left<self.platform.rect.left:
 			self.direction = -1
+			self.dir_changed = not self.dir_changed
 
 	def floating(self): #ennemi qui flotte
 		self.yMove += (self.direction==-1)*self.speed - (self.direction==1)*self.speed #on definit un decalage y pour son deplacement
@@ -709,7 +719,7 @@ class GAME():
 		self.dir_color = -1
 		self.time_color = 0
 		self.max_time_color = 4000
-		self.night = (64,17,142)
+		self.night = (64,17,142) 
 		self.day = (196,233,242)
 		self.night_mode = "day"
 		self.stars_list = []
@@ -726,6 +736,8 @@ class GAME():
 		self.sun_rect.x = width_screen
 		self.sun_rect.y = height_screen/2
 		self.sun_angle = math.pi
+
+		self.ISNIGHT = False
 
 		#VIES
 		self.heartFull = pygame.image.load(UI+"heartFull.png").convert_alpha() #chargement des images pour l'UI
@@ -762,7 +774,7 @@ class GAME():
 		screen.blit(self.numbers[int(player.coins)],(1267,15)) #afficher le nombre de pieces et l'image piece
 
 	def nightMode(self):
-		for i in range(random.randint(10,20)):
+		for i in range(random.randint(10,15)):
 			star = STAR()
 
 	def moon_sun(self):
@@ -797,6 +809,7 @@ class GAME():
 				self.night_mode="day>night"
 				self.time_color=0
 				self.max_time_color = 4000
+				self.ISNIGHT = True
 
 		if self.night_mode=="day>night":
 			self.sun_angle+=math.pi/10000
@@ -815,6 +828,7 @@ class GAME():
 			self.moon_angle+=math.pi/6000
 			self.time_color+=1
 			if self.time_color>self.max_time_color:
+				self.ISNIGHT = False
 				self.night_mode="night>day"
 				self.sun_angle=math.pi
 				self.time_color=0
@@ -877,7 +891,7 @@ class GAME():
 player = PLAYER()
 game = GAME()
 
-for i in range(random.randint(10,20)): #instanciation des nuages pour le fond
+for i in range(random.randint(10,15)): #instanciation des nuages pour le fond
 	cloud = CLOUD(random.randint(0,width_screen),random.randint(0,512),random.randint(8,15)) #(x,y,speed)
 	clouds.add(cloud) #ajout au groupe de sprites
 
