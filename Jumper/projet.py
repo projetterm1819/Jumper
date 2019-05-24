@@ -84,7 +84,7 @@ class PLAYER(pygame.sprite.Sprite): #Tout ce qui concerne le joueur
 		#GLOBAL
 		self.posX = 470  #Position en X (Par rapport au Left)
 		self.posY = -700 #Position en Y (par rapport au Top) .. 700 pixels + hauts, pour tomber sur une plateforme
-		self.lives = 50 #Nombre de vies
+		self.lives = 5 #Nombre de vies
 		self.isdead = False
 		self.coins = 0
 		self.playerChangeTime = 0 #pour changer le perso du joueur au bout d'un certain tes
