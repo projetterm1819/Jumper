@@ -7,7 +7,7 @@ h=766
 
 #fonction lancer le jeu
 def launchGame():
-	sp.Popen(("python","projet.py"))
+	sp.Popen(("python","resizable.py"))
 	ScreenMenu.destroy()
 
 #fonction quitter
@@ -38,3 +38,4 @@ Bouton.place(bordermode=OUTSIDE, height=76, width=512,x=400,y=148)
 
 
 ScreenMenu.mainloop()
+

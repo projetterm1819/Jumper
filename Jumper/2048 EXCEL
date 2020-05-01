@@ -1,0 +1,293 @@
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''Les variables publiques'''''''''''''''''''
+Public en_jeu
+Public score
+Public dimension
+Public win
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''Suppression'''''''''''''''''''''''''''''''
+Sub suppression()
+    For Column = 2 To dimension + 1 'pour chaque colonne, en partant de la seconde jusqu'à la fin du tableau +1
+        For Line = 2 To dimension + 1 'pour chaque ligne, en partant de la seconde jusqu'à la fin du tableau +1
+            Worksheets("Jeu").Cells(Line, Column) = "" 'on efface le contenu de la case
+            Worksheets("Jeu").Cells(Line, Column).Interior.ColorIndex = 2 'la case devient blanche
+            Worksheets("Jeu").Cells(Line, Column).Borders.LineStyle = xlNone 'les bordures disparaissent
+        Next Line
+    Next Column
+End Sub
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''Generation''''''''''''''''''''''''''''''''
+Sub generation(nb) 'on fait rentrer en parametre la variable nb
+    test_fin = True
+    For Column = 2 To dimension + 1 'pour chaque colonne, en partant de la seconde jusqu'à la fin du tableau +1
+        For Line = 2 To dimension + 1 'pour chaque ligne, en partant de la seconde jusqu'à la fin du tableau +1
+            If Worksheets("Jeu").Cells(Line, Column) = "" And test_fin = True Then 'si il n'y a rien dans la case et que test_fin est encore vrai alors
+                test_fin = False 'alors on a au moins une case de libre..Pas besoin de verifier celles d'apres
+            End If
+        Next Line
+    Next Column
+    If test_fin = True Then 'si la variable est encore vraie.. Toutes les cases sont remplis donc..
+    MsgBox "moi ce que je peux te dire... C'est que t'es mal barré.." 'Le joueur doit commencer a avoir des sueurs froides
+    
+    For i = 1 To nb 'Pour i allant de 1 à nb (nombre de trucs a generer)
+        If WorksheetFunction.Floor(4 * Rnd, 1) = 0 Then 'Si la fonction aleatoire tombe sur 0 alors
+            Ch = 4 'la variable Ch prend la valeur 4
+        Else 'sinon la fonction est tombé sur 1;2 ou 3 donc
+            Ch = 2 'La variable ch prend la valeur 2
+        End If
+        remplissage = True
+        While remplissage = True 'on sait d'avance qu'il y'a forcement une case libre au moins, tant que remplissage est vrai
+            Column = WorksheetFunction.Floor(dimension * Rnd + 2, 1) 'Une colonne au hasard dans le tableau
+            Line = WorksheetFunction.Floor(dimension * Rnd + 2, 1) 'une ligne au hasard dans le tableau
+            If Worksheets("Jeu").Cells(Line, Column) = "" Then 'si la cellule tirée au hasard est vide alors
+                Worksheets("Jeu").Cells(Line, Column) = Ch 'on lui donne la valeur de Ch
+                remplissage = False 'On modifie la variable remplissage pour ne pas refaire un tour de boucle
+            End If
+        Wend
+    Next i
+    Call coloration 'on colore les cases du tableau
+    Call resultat 'on calcule le score
+End Sub
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''Initialisation''''''''''''''''''''''''''''
+Sub initialisation()
+    Call suppression 'On supprime les cases precedentes
+    dimension = Worksheets("Config").Cells(2, 4).Value 'On va chercher les dimensions du jeu à créer
+    For Line = 2 To dimension + 1 'pour chaque ligne, en partant de la seconde jusqu'à la fin du tableau +1
+        Worksheets("Jeu").Rows(Line).RowHeight = 15 * 5.3 'le coefficient permet de creer une cellule presque carrée (ici on ne modifie que la longueur des lignes)
+    Next Line
+    For Column = 2 To dimension + 1 'pour chaque colonne, en partant de la seconde jusqu'à la fin du tableau +1
+        Worksheets("Jeu").Columns(Column).ColumnWidth = 15 'modifie la hauteur des colonnes
+        For Line = 2 To dimension + 1 'pour chaque ligne, en partant de la seconde jusqu'à la fin du tableau +1
+            Worksheets("Jeu").Cells(Line, Column).Borders.Color = Worksheets("Config").Cells(1, 15).Borders.Color 'défini la couleur de la bordure sur celle de la case "A15" de la feuille config
+            Worksheets("Jeu").Cells(Line, Column).Borders.LineStyle = xlContinuous 'défini le type de bordure
+            Worksheets("Jeu").Cells(Line, Column).Borders.Weight = xlThick 'défini l'épaisseur de la bordure
+        Next Line
+    Next Column
+    score = 0 'initialise le score a zero
+    en_jeu = True 'commence le jeu
+    Call generation(2) 'genere deux cases
+End Sub
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''''''''bas'''''''''''''''''''''''''''''''''
+Sub bas()
+regen = False 'On initialise la variable a False
+    If en_jeu = True Then 'si on est en jeu alors
+        For Column = 2 To dimension + 1 'pour chaque colonne, en partant de la seconde jusqu'à la fin du tableau +1
+            For Line = 2 To dimension + 1 'pour chaque ligne, en partant de la seconde jusqu'à la fin du tableau +1
+                valdubas = Worksheets("Jeu").Cells(dimension + 3 - Line, Column) 'valdubas prend la valeur de la case observée
+                If valdubas = "" Then 'si la case du bas est vide alors
+                    valduhaut = 0 'valduhaut prend une valeur par defaut
+                    For Up = Line + 1 To dimension + 1 'pour chacune des lignes restantes...
+                        Update = dimension + 3 - Up '...en commencant par celle au dessus de la cellule observée et en remontant le tableau
+                        If Worksheets("Jeu").Cells(Update, Column) <> "" And valduhaut = 0 Then 'si la cellule du dessus a une valeur et que valduhaut a encore sa valeur par défaut alors
+                            valduhaut = Worksheets("Jeu").Cells(Update, Column) 'valduhaut prend la valeur de la cellule du dessus
+                            upload = Update 'upload prend le numero de la ligne du dessus
+                            score = valduhaut + score 'le score s'incrémente
+                            regen = True 'ce mouvement autorise la génération
+                        End If
+                    Next Up
+                    If valduhaut <> 0 Then 'si valduhaut a pris une valeur alors
+                        Worksheets("Jeu").Cells(dimension + 3 - Line, Column) = valduhaut 'la ligne observée prend la valeur de la case la case du dessus
+                        Worksheets("Jeu").Cells(upload, Column) = "" 'la case du dessus perd sa valeur
+                    End If
+                End If
+                valduhaut = 0 'valduhaut prend une valeur par defaut
+                valdubas = Worksheets("Jeu").Cells(dimension + 3 - Line, Column) 'valdubas prend la valeur de la case observée
+                If valdubas <> "" Then 'si la cellule observée a une valeur
+                    valutile = True 'valutile prend une valeur par défaut
+                    For Up = Line + 1 To dimension + 1 'pour chacune des lignes restantes...
+                        Update = dimension + 3 - Up '...en commencant par celle au dessus de la cellule observée et en remontant le tableau
+                        If Worksheets("Jeu").Cells(Update, Column) <> "" And valutile = True Then 'si la cellule du dessus a une valeur et que valutile a encore sa valeur par défaut alors
+                            valutile = False 'valutile change de valeur
+                            If Worksheets("Jeu").Cells(Update, Column) = valdubas And valduhaut = 0 Then 'si la cellule du dessus a la meme valeur que la case regardée ET que valduhaut n'est pas defini
+                                valduhaut = Worksheets("Jeu").Cells(Update, Column) * 2 'valduhaut prend la valeur de la cellule du dessus
+                                upload = Update 'upload prend le numero de la ligne du dessus
+                                score = valduhaut + score 'le score s'incremente
+                            End If
+                        End If
+                    Next Up
+                    If valduhaut <> 0 Then 'si valduhaut n'a plus sa valeur par défaut
+                        Worksheets("Jeu").Cells(dimension + 3 - Line, Column) = valduhaut 'la ligne observée prend la valeur de la case la cellule du dessus
+                        Worksheets("Jeu").Cells(upload, Column) = "" 'la cellule du dessus perd sa valeur
+                        regen = True 'ce mouvement autorise la génération
+                    End If
+                End If
+            Next Line
+        Next Column
+        If regen = True Then 'si au moins un mouvement autorise la generation
+        generation (1) 'on genere un nombre a rajouter dans une des cellules disponibles
+        End If
+    End If
+End Sub
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''''''''haut''''''''''''''''''''''''''''''''
+Sub haut()
+regen = False 'On initialise la variable a False
+    If en_jeu = True Then 'si on est en jeu alors
+        For Column = 2 To dimension + 1 'pour chaque colonne, en partant de la seconde jusqu'à la fin du tableau +1
+            For Line = 2 To dimension + 1 'pour chaque ligne, en partant de la seconde jusqu'à la fin du tableau +1
+                valduhaut = Worksheets("Jeu").Cells(Line, Column) 'valduhaut prend la valeur de la case observée
+                If valduhaut = "" Then 'si la cellule du haut est vide alors
+                    valdubas = 0 'valdubas prend une valeur par defaut
+                    For Down = Line + 1 To dimension + 1 'pour chacune des lignes restantes (en descendant)
+                            If Worksheets("Jeu").Cells(Down, Column) <> "" And valdubas = 0 Then 'si la cellule du dessous a une valeur et que valdubas a encore sa valeur par défaut alors
+                            valdubas = Worksheets("Jeu").Cells(Down, Column) 'valdubas prend la valeur de la cellule du dessous
+                            Download = Down 'download prend le numero de la ligne du dessous
+                            score = valdubas + score 'le score s'incrémente
+                            regen = True 'ce mouvement autorise la generation
+                        End If
+                    Next Down 'On essaye la ligne suivante
+                    If valdubas <> 0 Then 'si valdubas a pris une valeur alors
+                        Worksheets("Jeu").Cells(Line, Column) = valdubas 'la ligne observée prend la valeur de la case valdubas_
+                        Worksheets("Jeu").Cells(Download, Column) = "" 'la cellule ayant une valeur la plus proche (dans la colonne uniquement) perd sa valeur_
+                    End If
+                End If
+                valduhaut = Worksheets("Jeu").Cells(Line, Column) 'valduhaut prend la valeur de la case, en commencant par le haut de la colonne_
+                If valduhaut <> "" Then 'sinon si la cellule regardée a une valeur_
+                    valutile = True
+                    For Down = Line + 1 To dimension + 1 'pour chacune des lignes du dessous_
+                        If Worksheets("Jeu").Cells(Down, Column) <> "" And valutile = True Then
+                            valutile = False
+                            If Worksheets("Jeu").Cells(Down, Column) = valduhaut And valdubas = 0 Then 'si la cellule du dessous a la meme valeur que la case regardée ET que valdubas n'est pas defini_
+                                valdubas = Worksheets("Jeu").Cells(Down, Column) * 2 'valdubas prend la  somme des valeurs de la cellule du dessous et de la cellule regardée_
+                                Download = Down 'download prend le numero de la ligne associée_)
+                                score = valdubas + score
+                            End If
+                        End If
+                    Next Down
+                    If valdubas <> 0 Then 'si valdubas a pris une valeur_
+                        Worksheets("Jeu").Cells(Line, Column) = valdubas 'la ligne en question prend la valeur de valdubas_
+                        Worksheets("Jeu").Cells(Download, Column) = "" 'la cellule ayant une valeur la plus proche (dans la colonne uniquement) perd sa valeur_
+                        regen = True
+                    End If
+                End If
+            Next Line
+        Next Column
+        If regen = True Then
+            generation (1)
+        End If
+    End If
+End Sub
+
+Sub gauche()
+regen = False 'On initialise la variable a False
+    If en_jeu = True Then 'si on est en jeu alors
+        For Column = 2 To dimension + 1 'pour chaque colonne, en partant de la seconde jusqu'à la fin du tableau +1
+            For Line = 2 To dimension + 1 'pour chaque ligne, en partant de la seconde jusqu'à la fin du tableau +1
+                valdedroite = 0 'valdedroite prend une valeur par defaut_
+                valdegauche = Worksheets("Jeu").Cells(Line, Column) 'valdegauche prend la valeur de la case, en commencant par le gauche de la ligne_
+                If valdegauche = "" Then 'si valdegauche n est pas defini alors_
+                    For front = Column + 1 To dimension + 1 'pour chacune des colonnes restantes_
+                        If Worksheets("Jeu").Cells(Line, front) <> "" And valdedroite = 0 Then 'si la cellule du dessous a une valeur et que valdedroite n a pas de valeur_
+                            valdedroite = Worksheets("Jeu").Cells(Line, front) 'valdedroite prend la valeur de la cellule regardée_
+                            frontload = front 'frontload prend le numero de la colonne associée_
+                            score = valdedroite + score
+                            regen = True
+                        End If
+                    Next front 'On essaye la colonne suivante_
+                    If valdedroite <> 0 Then 'si valdedroite a pris une valeur_
+                        Worksheets("Jeu").Cells(Line, Column) = valdedroite 'la ligne regardée en premiere prend la valeur de valdedroite_
+                        Worksheets("Jeu").Cells(Line, frontload) = "" 'la cellule ayant une valeur la plus proche (dans la colonne uniquement) perd sa valeur_
+                    End If
+                End If
+                valdegauche = Worksheets("Jeu").Cells(Line, Column) 'valdegauche prend la valeur de la case, en commencant par le gauche de la ligne_
+                If valdegauche <> "" Then
+                    valutile = True
+                    For front = Column + 1 To dimension + 1 'pour chacune des lignes du dessous_
+                        If Worksheets("Jeu").Cells(Line, front) <> "" And valutile = True Then
+                            valutile = False
+                            If Worksheets("Jeu").Cells(Line, front) = valdegauche And valdedroite = 0 Then 'si la cellule du dessous a la meme valeur que la case regardée ET que valdedroite n'est pas defini_
+                                valdedroite = Worksheets("Jeu").Cells(Line, front) * 2 'valdedroite prend la  somme des valeurs de la cellule du dessous et de la cellule regardée_
+                                frontload = front 'frontload prend le numero de la ligne associée_
+                                score = valdedroite + score
+                            End If
+                        End If
+                    Next front
+                    If valdedroite <> 0 Then 'si valdedroite a pris une valeur_
+                        Worksheets("Jeu").Cells(Line, Column) = valdedroite 'la ligne en question prend la valeur de valdedroite_
+                        Worksheets("Jeu").Cells(Line, frontload) = "" 'la cellule ayant une valeur la plus proche (dans la colonne uniquement) perd sa valeur_
+                        regen = True
+                    End If
+                End If
+            Next Column
+        Next Line
+        If regen = True Then
+            generation (1)
+        End If
+    End If
+End Sub
+
+Sub droite()
+regen = False
+    If en_jeu = True Then 'si on est en jeu_
+        For Line = 2 To dimension + 1 'pour chacune des lignes_
+            For Column = 2 To dimension + 1 'pour chacune des colonnes_
+                valdegauche = 0 'valdegauche prend une valeur par defaut_
+                valdedroite = Worksheets("Jeu").Cells(Line, dimension + 3 - Column) 'valdedroite prend la valeur de la case, en commencant par le bas de la colonne_
+                If valdedroite = "" Then 'si valdedroite n est pas defini alors_
+                    For back = Column + 1 To dimension + 1 'pour chacune des lignes restantes_
+                        backdate = dimension + 3 - back 'backdate prend la valeur de la case du dessus_
+                        If Worksheets("Jeu").Cells(Line, backdate) <> "" And valdegauche = 0 Then 'si la cellule de gauche a une valeur et que valdegauche n a pas de valeur_
+                            valdegauche = Worksheets("Jeu").Cells(Line, backdate) 'valdegauche prend la valeur de la cellule de gauche_
+                            backload = backdate 'backload prend le numero de la colonne associée_
+                            score = valdeauche + score
+                            regen = True
+                        End If
+                    Next back 'On essaye la colonne de gauche_
+                    If valdegauche <> 0 Then 'si valdegauche a pris une valeur_
+                        Worksheets("Jeu").Cells(Line, dimension + 3 - Column) = valdegauche 'la ligne en question prend la valeur de valdegauche_
+                        Worksheets("Jeu").Cells(Line, backload) = "" 'la cellule ayant une valeur la plus proche (dans la ligne uniquement) perd sa valeur_
+                    End If
+                End If
+                valdedroite = Worksheets("Jeu").Cells(Line, dimension + 3 - Column) 'valdedroite prend la valeur de la case, en commencant par le bas de la colonne_
+                If valdedroite <> "" Then 'sinon si la cellule regardée a une valeur_
+                    valutile = True
+                    For back = Column + 1 To dimension + 1 'pour chacune des colonnes de gauche_
+                        backdate = dimension + 3 - back 'backdate prend la valeur de la case de gauche_
+                        If Worksheets("Jeu").Cells(Line, backdate) <> "" And valutile = True Then
+                            valutile = False
+                            If Worksheets("Jeu").Cells(Line, backdate) = valdedroite And valdegauche = 0 Then 'si la cellule de gauche a la meme valeur que la case regardée ET que valdegauche n'est pas defini
+                                valdegauche = Worksheets("Jeu").Cells(Line, backdate) * 2 'valdegauche prend la valeur de la somme de la cellule regardée et de celle de gauche_
+                                backload = backdate 'backload prend le numero de la ligne associée_
+                                score = valdeauche + score
+                            End If
+                        End If
+                    Next back
+                    If valdegauche <> 0 Then 'si valdegauche a pris une valeur_
+                        Worksheets("Jeu").Cells(Line, dimension + 3 - Column) = valdegauche 'la ligne en question prend la valeur de valdegauche_
+                        Worksheets("Jeu").Cells(Line, backload) = "" 'la cellule ayant une valeur la plus proche (dans la ligne uniquement) perd sa valeur_
+                        regen = True
+
+                    End If
+                End If
+            Next Column
+        Next Line
+        If regen = True Then
+        generation (1)
+        End If
+    End If
+End Sub
+
+Sub resultat()
+Worksheets("Jeu").Cells(1, 5) = score
+End Sub
+Sub coloration()
+    For Line = 2 To dimension + 1
+        For Column = 2 To dimension + 1
+            If Worksheets("Jeu").Cells(Line, Column) <> "" Then
+                If Worksheets("Jeu").Cells(Line, Column) <= 2048 Then
+                    colour = Worksheets("Config").Cells(1 + Log(Worksheets("Jeu").Cells(Line, Column)) / Log(2), 1).Interior.Color
+                Else
+                    colour = Worksheets("Config").Cells(1, 13).Interior.Color
+                End If
+            Else
+                colour = Worksheets("Config").Cells(1, 1).Interior.Color
+            End If
+            Worksheets("Jeu").Cells(Line, Column).Interior.Color = colour
+        Next Column
+    Next Line
+End Sub
+
+
